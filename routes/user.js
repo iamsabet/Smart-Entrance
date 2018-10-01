@@ -769,7 +769,6 @@ var user = {
                                     }, function (err, resultz) {
                                         if (resultz) {
                                             if(result.extraData.class2 && (parseInt(result.extraData.class2.classId) === parseInt(req.body.classId))){
-                                                if(resultz.extraData.class2){
 																									res.send({
 	                                                    classId: resultz.extraData.class2.classId,
 	                                                    command: resultz.command
@@ -777,7 +776,7 @@ var user = {
 																								}
 																								else{
 																									res.send({
-	                                                    classId: resultz.extraData.class2.classId,
+	                                                    classId: resultz.extraData.class.classId,
 	                                                    command: resultz.command
 	                                                });
 																								}
