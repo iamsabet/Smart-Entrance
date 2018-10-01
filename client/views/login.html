@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script src="../javascripts/jquery.min.js"></script>
+    <script src="../javascripts/cookies.js"></script>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <title>Login</title>
+</head>
+<body>
+<div class="pageContainer">
+    <div class="nav">
+        <h2>Smart Entrance</h2>
+        <button id="giot" title="Green IOT"></button>
+    </div>
+
+<div class="container show">
+    <h3>Login</h3>
+    <form action="/">
+        <input type="text" placeholder="username" class="username">
+        <input type="password" placeholder="password" class="password">
+        <button id="login">Login</button>
+    </form>
+</div>
+</div>
+</body>
+<script>
+
+    $("body").on("submit","form",function(event){
+       event.preventDefault();
+    });
+    $("body").on("click","#login",function(){
+        $.ajax({
+            url:"/admin/login",
+            method:"POST",
+            data : {
+                username : $(".username").val(),
+                password: $(".password").val()
+            },
+            success:function(res){
+                if(!res.message) {
+                    createCookie("X-ACCESS-TOKEN", res["token"], 1);
+                    createCookie("KEY", res["key"], 1);
+                    window.location.pathname = "/";
+                }
+                else{
+                    alert(res.message);
+                }
+            },
+            fail:function(){
+                alert("invalid credentials , try again");
+            },
+            timeout:function(){
+                alert("request timeout");
+            },
+            error:function(){
+                alert("invalid credentials , try again");
+            }
+        })
+    });
+
+</script>
+</html>

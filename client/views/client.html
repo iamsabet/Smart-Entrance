@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script src="../javascripts/jquery.min.js"></script>
+    <script src="../javascripts/moment/moment.js"></script>
+    <script src="../javascripts/moment-jalaali/build/moment-jalaali.js"></script>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <title>Smart Entrance</title>
+</head>
+<body>
+<div class="">
+
+    <div id="alertTop">
+        <h3></h3>
+    </div>
+    <div class="nav">
+        <p class="clock"></p>
+        <p class="date"></p>
+        <h1>Smart Entrance</h1>
+        <button id="giot" title="Green IOT"></button>
+    </div>
+    <div class="clientMonitor">
+        <h2> Current Classes </h2>
+        <ul class="classList">
+
+        </ul>
+    </div>
+    <div id="admin">
+        <button class="closeAdmin">
+
+        </button>
+        <h1 class="show">Admin Panel</h1>
+        <h2 class="classes"> Classes </h2>
+        <ul class="clsList">
+
+        </ul>
+        <h2 class="users"> Users </h2>
+        <ul class="usrList">
+
+        </ul>
+    </div>
+    <div class="clientButtons">
+        <h2></h2>
+        <span class="marginTop">  Enter your RFID Card or Fingerprint </span>
+        <button class="on">Open</button>
+        <button class="off">Close</button>
+				<button class="on2">Open</button>
+        <button class="off2">Close</button>
+        <button class="onProject">Close</button>
+    </div>
+</div>
+</body>
+
+<script>
+    var classid = 0;
+    var me = null;
+    var cls = {};
+		var cls2 = {};
+    var countDown ;
+    let seconds = 9;
+    var timer;
+    var thisDay ;
+    var classesList = [];
+    $(document).ready(function(){
+        initPage();
+        getNowClasses();
+        initClock();
+        initDate();
+        setInterval(function(){
+            getNowClasses();
+        }, 60000);
+
+        // setInterval(function(){
+        //     checkAdminCommands();
+        // },5000);
+    });
+    $("body").on("click",".on.activateAdmin",function(){ // classes list show
+        $("#admin").addClass("show");
+        getNumberClasses();
+        $("#admin .clsList").addClass("show");
+        $("#admin .classes").addClass("show");
+        $("#admin .users").removeClass("show");
+        $("#admin .usrList").removeClass("show");
+        $(".clientButtons span").removeClass("marginTop");
+    });
+    $("body").on("click",".off.activateAdmin",function(){ // users list show
+        $("#admin").addClass("show");
+        getAllUsers();
+        $("#admin .usrList").addClass("show");
+        $("#admin .users").addClass("show");
+        $("#admin .clsList").removeClass("show");
+        $("#admin .classes").removeClass("show");
+        $(".clientButtons span").removeClass("marginTop");
+    });
+    $("body").on("click",".closeAdmin",function(){ // classes list show
+        logoutAndRefresh();
+    });
+    $("body").on("click","#admin ul .sample.rfid",function(){
+        username = $(this).siblings("span").html();
+        sampleState($(this),"rfid");
+    });
+    $("body").on("click","#admin ul .sample.finger",function(){
+        username = $(this).siblings("span").html();
+        sampleState($(this),"finger");
+    });
+    $("body").on("click",".on.activate",function(){
+        sendOnCommand(cls.classId);
+    });
+		$("body").on("click",".on2.activate",function(){
+        sendOnCommand(cls2.classId);
+    });
+
+    $("body").on("click",".onProject.activate",function(){
+			if(cls.accessProject){
+        if(cls.accessProject) {
+            sendOnCommand(cls.accessProject);
+        }
+        else{
+            alert("You dont have access to the project room at the moment");
+        }
+			}
+			else if(cls2.accessProject){
+				if(cls2.accessProject) {
+            sendOnCommand(cls2.accessProject);
+        }
+        else{
+            alert("You dont have access to the project room at the moment");
+        }
+			}
+    });
+		$("body").on("click",".off2.activate",function(){
+			off(cls2.classId);
+		});
+    $("body").on("click",".off.activate",function(){
+        off(cls.classId);
+    });
+		function off(classId){
+			$.ajax({
+					url: "/client/offCommand",
+					method: "POST",
+					data:{
+						classId:classId
+					},
+					success: function (res) {
+							if(res.data){
+								classid = classId;
+									$(`#class-${classid} > a`).addClass("close");
+									$(`#class-${classid} > a`).removeClass("open");
+									$(".clientButtons span").addClass("marginTop");
+									$(".clientButtons span").html("Class " + classid + " is closed");
+									clearInterval(countDown);
+									$(".clientButtons .on").removeClass("show");
+									$(".clientButtons .off").removeClass("show");
+									$(".clientButtons .on2").removeClass("show");
+									$(".clientButtons .off2").removeClass("show");
+									$(".clientButtons .on").removeClass("activate");
+									$(".clientButtons .off").removeClass("activate");
+									$(".clientButtons .on2").removeClass("activate");
+									$(".clientButtons .off2").removeClass("activate");
+									$(".clientButtons .onProject").removeClass("show");
+									$(".clientButtons img").addClass("show");
+									$(".clientButtons h2").html("");
+									setTimeout(function(){
+											initPage();
+											$(".clientButtons span").addClass("marginTop");
+											$(".clientButtons span").html("  Enter your RFID Card or Fingerprint ");
+									},3000);
+									clearInterval(countDown);
+							}
+							else{
+									$(".clientButtons span").html(res.message);
+									setTimeout(function(){
+											initPage();
+											$(".clientButtons span").addClass("marginTop");
+											$(".clientButtons span").html("  Enter your RFID Card or Fingerprint ");
+											clearInterval(countDown);
+									},3000);
+							}
+					},
+					fail: function (res) {
+							console.log(res);
+							alert("No connection to server");
+					},
+					timeout: function () {
+							alert("No connection to server");
+					}
+			});
+		}
+    function sendOnCommand(classId){
+        $.ajax({
+            url: "/client/onCommand",
+            method: "POST",
+            data:{
+                classId:classId
+            },
+            success: function (res) {
+                if(res.data){
+                    classid = classId;
+                    $(`#class-${classid} > a`).removeClass("close");
+                    $(`#class-${classid} > a`).addClass("open");
+                    if(me.role==="strudent")
+                        $(".clientButtons span").html("Class " + classid + " is opened for 45 seconds for you to reach");
+                    else
+                        $(".clientButtons span").html("Class " + classid + " is opened");
+                    $(".clientButtons span").addClass("marginTop");
+                    clearInterval(countDown);
+										$(".clientButtons .on").removeClass("show");
+										$(".clientButtons .off").removeClass("show");
+										$(".clientButtons .on2").removeClass("show");
+										$(".clientButtons .off2").removeClass("show");
+										$(".clientButtons .on").removeClass("activate");
+										$(".clientButtons .off").removeClass("activate");
+										$(".clientButtons .on2").removeClass("activate");
+										$(".clientButtons .off2").removeClass("activate");
+                    $(".clientButtons .onProject").removeClass("show");
+                    $(".clientButtons img").addClass("show");
+                    $(".clientButtons h2").html("");
+                    setTimeout(function(){
+                        initPage();
+                        $(".clientButtons span").addClass("marginTop");
+                        $(".clientButtons span").html(" Enter your RFID Card or Fingerprint ");
+                    },3000);
+                    clearInterval(countDown);
+                }
+                else{
+                    $(".clientButtons span").html(res.message);
+                    setTimeout(function(){
+                        initPage();
+                        $(".clientButtons span").addClass("marginTop");
+                        $(".clientButtons span").html(" Enter your RFID Card or Fingerprint ");
+                        clearInterval(countDown);
+                    },3000);
+                }
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+    }
+
+    function initPage(){
+        if(timer)
+            clearInterval(timer);
+        timer = setInterval(function(){
+            seconds = 9;
+            $.ajax({
+                url:"/client/checkAuth",
+                method:"POST",
+                success:function(res){
+                    let seconds;
+                    if(!res.message) {
+                        if (res.alertText) {
+                            $(".clientButtons span").html(res.alertText);
+                            setTimeout(function () {
+                                $(".clientButtons span").html("  Enter your RFID Card or Fingerprint ");
+                                initPage();
+                            }, 5000);
+                        }
+                        else if (res.sampling && res.samplingType === "rfid") {
+
+                            $(".clientButtons span").html(res.data.username + " Enter your RFID to register ");
+                            $(".clientButtons .rfid").addClass("show"); // img
+
+                            seconds = 9;
+                            clearInterval(countDown);
+                            $(".clientButtons h2").html(seconds);
+                            countDown = setInterval(function () {
+                                seconds--;
+                                $(".clientButtons h2").html(seconds);
+                                if (seconds === -1) {
+                                    clearInterval(countDown);
+                                    $(".clientButtons span").html(" Enter your RFID Card or Fingerprint ");
+                                    $(".clientButtons .on").removeClass("show");
+																		$(".clientButtons").removeClass("small");
+                                    $(".clientButtons .onProject").removeClass("show");
+                                    $(".clientButtons .off").removeClass("show");
+                                    $(".clientButtons img").addClass("show");
+                                    $(".clientButtons h2").html("");
+                                }
+                            }, 1000);
+
+
+                        }
+                        else if (res.sampling && res.samplingType === "fingerprint") {
+                            $(".clientButtons span").html(res.data.username + " Enter your RFID to register ");
+                            $(".clientButtons .finger").addClass("show"); // img
+                            // Count 5 Samples and send one by one -- > backend not by timer by time --> 1min timeout
+                            // seconds = 9;
+                            // clearInterval(countDown);
+                            // $(".clientButtons h2").html(seconds);
+                            // countDown = setInterval(function () {
+                            //     seconds--;
+                            //     $(".clientButtons h2").html(seconds);
+                            //     if (seconds === -1) {
+                            //         clearInterval(countDown);
+                            //         $(".clientButtons span").html(" Enter your RFID Card or Fingerprint ");
+                            //         $(".clientButtons .on").removeClass("show");
+                            //         $(".clientButtons .off").removeClass("show");
+                            //         $(".clientButtons img").addClass("show");
+                            //         $(".clientButtons h2").html("");
+                            //     }
+                            // }, 1000);
+                        }
+                        else {
+                            if(res.data.extraData && res.data.extraData) {
+                                me = res.data.extraData.user;
+                                cls = res.data.extraData.class;
+																cls2 = res.data.extraData.class2;
+                            }
+                            if(res.data) {
+                                if (me === null || me !== res.data) {
+                                    me = res.data;
+                                }
+                            }
+                            if (me.role === "admin" || me.role === "superuser") {
+                                $(".clientButtons span").html("Admin access " + me.username);
+                                initialAdminButtons();
+                                $(".clientButtons span").removeClass("marginTop");
+                                $("#admin").addClass("show");
+                                if (timer) {
+                                    clearInterval(timer);
+                                }
+
+                            }
+                            else if (me.role === "student") {
+                                $(".clientButtons span").html(`Welcome '${me.username}' your class is ${cls.classId}`);
+                                $(".clientButtons .on").addClass("show");
+																$(".clientButtons").removeClass("small");
+                                $(".clientButtons .on").addClass("activate");
+                                $(".clientButtons .onProject").removeClass("show");
+                                $(".clientButtons span").removeClass("marginTop");
+
+                                seconds = 9;
+                                clearInterval(countDown);
+                                $(".clientButtons h2").html(seconds);
+                                countDown = setInterval(function () {
+                                    seconds--;
+                                    $(".clientButtons h2").html(seconds);
+                                    if (seconds === -1) {
+                                        clearInterval(countDown);
+                                        $(".clientButtons span").html(" Enter your RFID Card or Fingerprint ");
+                                        $(".clientButtons span").addClass("marginTop");
+                                        $(".clientButtons .on").removeClass("show");
+                                        $(".clientButtons .off").removeClass("show");
+																				$(".clientButtons").removeClass("small");
+																				$(".clientButtons .on2").removeClass("show");
+                                        $(".clientButtons .off2").removeClass("show");
+                                        $(".clientButtons img").addClass("show");
+                                        $(".clientButtons h2").html("");
+                                    }
+                                }, 1000);
+                            }
+                            else if (me.role === "teacher") {
+                                if (cls.classId !== 0) {
+
+                                    $(".clientButtons span").removeClass("marginTop");
+
+                                    if (cls.situation === "close") {
+																			$(".clientButtons .on").html("Open : " + cls.classId);
+																			$(".clientButtons .on").addClass("show");
+                                      $(".clientButtons .on").addClass("activate");
+                                      $(".clientButtons .off").removeClass("show");
+                                    }
+                                    else if (cls.situation === "open") {
+																			$(".clientButtons .off").html("Close : " + cls.classId);
+																			$(".clientButtons .off").addClass("show");
+                                      $(".clientButtons .off").addClass("activate");
+                                      $(".clientButtons .on").removeClass("show");
+                                    }
+																		if(cls.accessProject !== null){
+																			if(cls2){
+																				$(".clientButtons").addClass("small");
+																			}
+                                      $(".clientButtons .onProject").addClass("activate");
+                                      $(".clientButtons .onProject").html("Open Project Room " + cls.accessProject);
+                                      $(".clientButtons .onProject").addClass("show");
+                                    }
+
+                                    $(".clientButtons img").removeClass("show");
+
+																		if(Object.keys(cls2).length > 0){
+																			$(".clientButtons span").html(`Welcome '${me.username}' your classes Are (${cls.classId} , ${cls2.classId})`);
+																			if (cls2.classId !== 0) {
+																				if (cls2.situation === "close") {
+																					$(".clientButtons .on2").addClass("activate");
+																					$(".clientButtons .on2").html("Open : " + cls2.classId);
+																					$(".clientButtons .on2").addClass("show");
+	                                        $(".clientButtons .off2").removeClass("show");
+		                                    }
+		                                    else if (cls2.situation === "open") {
+																					$(".clientButtons .off2").html("Close : " + cls2.classId);
+																					$(".clientButtons .off2").addClass("show");
+	                                        $(".clientButtons .off2").addClass("activate");
+	                                        $(".clientButtons .on2").removeClass("show");
+		                                    }
+																				if(!$(".clientButtons .onProject.show")[0]){
+																					if(cls2.accessProject !== null){
+																						$(".clientButtons").addClass("small");
+		                                        $(".clientButtons .onProject").addClass("activate");
+		                                        $(".clientButtons .onProject").html("Open Project Room " + cls2.accessProject);
+		                                        $(".clientButtons .onProject").addClass("show");
+			                                    }
+																				}
+																			}
+																		}
+
+                                    seconds = 9;
+                                    clearInterval(countDown);
+                                    $(".clientButtons h2").html(seconds);
+                                    countDown = setInterval(function () {
+                                        seconds--;
+                                        $(".clientButtons h2").html(seconds);
+                                        if (seconds === -1) {
+                                            clearInterval(countDown);
+                                            $(".clientButtons span").html(" Enter your RFID Card or Fingerprint ");
+                                            $(".clientButtons span").addClass("marginTop");
+                                            $(".clientButtons .on").removeClass("show");
+																						$(".clientButtons").removeClass("small");
+																						$(".clientButtons .on2").removeClass("show");
+																						$(".clientButtons .off2").removeClass("show");
+                                            $(".clientButtons .off").removeClass("show");
+                                            $(".clientButtons .onProject").removeClass("show");
+                                            $(".clientButtons img").addClass("show");
+                                            $(".clientButtons h2").html("");
+                                        }
+                                    }, 1000);
+                                }
+                            }
+                            else {
+                                console.log(me);
+                                if(me.sampling === true){
+
+                                    let text = "Enter your RFID";
+                                    seconds = 7;
+                                    if(me.samplingType==="finger"){
+                                        seconds = 11;
+                                        text = "Place your finger on the sensor";
+                                    }
+                                    clearInterval(countDown);
+                                    $(".clientButtons span").html(text);
+                                    countDown = setInterval(function () {
+                                        seconds--;
+                                        $(".clientButtons h2").html(seconds);
+                                        if (seconds === -1) {
+                                            clearInterval(countDown);
+                                            $(".clientButtons span").html("Enter your RFID Card or Fingerprint");
+                                            $(".clientButtons span").addClass("marginTop");
+                                            $(".clientButtons .on").removeClass("show");
+                                            $(".clientButtons .off").removeClass("show");
+																						$(".clientButtons .on2").removeClass("show");
+                                            $(".clientButtons .off2").removeClass("show");
+                                            $(".clientButtons img").addClass("show");
+                                            $(".clientButtons h2").html("");
+                                        }
+                                    }, 1000);
+                                }
+                                else{
+                                    alert("User " + me.username + " has no role in the system");
+                                }
+                            }
+                        }
+                        clearInterval(timer);
+                        setTimeout(function () {
+                            initPage();
+                        }, seconds*1000);
+                    }
+                    else{
+                        if(!res.message.startsWith("No one")) {
+                            $(".clientButtons span").html(res.message);
+                            setTimeout(function () {
+                                $(".clientButtons span").html("  Enter your RFID Card or Fingerprint ");
+                            }, 2000);
+                        }
+                    }
+                },
+                fail: function (res) {
+                    console.log(res);
+                    alert("No connection to server");
+                },
+                timeout: function () {
+                    alert("No connection to server");
+                }
+            });
+        }, 500);
+    }
+    function alert(message){
+        $("#alertTop h3").html(message);
+        $("#alertTop").addClass("show");
+        setTimeout(function (){
+            $("#alertTop").removeClass("show");
+            // Something you want delayed.
+        }, 5000); // 5seconds show
+    }
+
+
+    function fakeAuth(z){
+        $.ajax({
+            url:"/client/takeSample",
+            method:"POST",
+            data:{
+                rfId:z
+            },
+            success:function(res){
+
+                if(!res.message) {
+                    // console.log(res);
+                }
+                else{
+                    $(".clientButtons span").html(res.message);
+                    setTimeout(function(){
+                        initPage();
+                        $(".clientButtons span").html("  Enter your RFID Card or Fingerprint ");
+                    },5000);
+                }
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+    }
+    function checkAdminCommands(){
+        $.ajax({
+            url:"/client/checkAdminCommand",
+            method:"GET",
+            success:function(res){
+                if(res){
+                    if(!res.message) {
+                        getNowClasses();
+                        console.log("Admin Command Execute");
+                        console.log(res);
+                    }
+                    else{
+                        console.log(res);
+                    }
+
+                }
+                else{
+                    console.log("no command");
+                }
+            }
+        });
+    }
+    function getNowClasses(){
+
+        $.ajax({
+            url:"/client/getNowClasses",
+            method:"GET",
+            beforeSend:function(){
+            },
+            success:function(res){
+                $(".classList").html("");
+                if (res.length > 0) {
+                    if(res !== classesList) {
+                        classesList = res;
+                        parseClasses(classesList[4],"project"); // parse project room after
+                        parseClasses(classesList[1],"green"); // parse until 15min before
+                        parseClasses(classesList[0],"white"); // parse Main
+                        parseClasses(classesList[3],"white"); // parse Everyday classes (publics mostly)
+                        parseClasses(classesList[2],"blue"); // parse until 5min after
+                        if((classesList[0].length === 0) && (classesList[1].length === 0) && (classesList[2].length === 0) && (classesList[3].length === 0)){
+                            $(".classList").append(`
+                           <li class="eachClass">
+                                <span></span>
+                                 <span>No class is available right now</span>
+                            </li>
+                         `);
+                        }
+                    }
+                }
+                else{
+                    $(".classList").append(`
+                           <li class="eachClass">
+                                <span></span>
+                                 <span>No class is available right now</span>
+                            </li>
+                         `);
+                }
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+    }
+    function initDate(){
+        $(".date").html(moment().format('jYYYY/jM/jD'));
+    }
+    function initClock() {
+        setInterval(function(){
+            let dates = new Date().toString().split(" ");
+            thisDay = dates[0];
+
+
+            $(".clock").html( thisDay + " " + dates[4].split(":")[0]+":"+dates[4].split(":")[1]+":"+dates[4].split(":")[2]);
+        },999)
+
+    }
+
+    function parseClasses(cls,color){
+
+        if(color !== "project"){
+            $.each(cls, function (index, data) {
+                let colorClass = color || "white";
+                let project = ``;
+                let publicz = ``;
+                let classNumber = "";
+                if(cls[index].leftDate.minute === 0){
+                    cls[index].leftDate.minute = "00";
+                }
+                if(cls[index].rightDate.minute === 0){
+                    cls[index].rightDate.minute = "00";
+                }
+                if(cls[index].classId === 206){
+                    classNumber = "206-A";
+                }
+                else if(cls[index].classId === 226){
+                    classNumber = "206-B";
+                }
+                else{
+                    classNumber = cls[index].classId;
+                }
+
+
+
+                if((cls[index].accessProject !== null) && (cls[index].accessProject !== undefined))
+                    project = `Side Access : ${cls[index].accessProject}`;
+                if(cls[index].isPublic) {
+                    publicz = `<button class="publicIcon"></button>
+                                <p class="studentsList">students : [ ${cls[index].studentsList.join(", ").toString()} ]</p>
+                                `;
+                }
+                $(".classList").append(`
+                            <li class="eachClass ${colorClass}" id="class-${cls[index].classId}">
+                                    <span class="weekDay"> ${classNumber}</span>
+                                    <span>${cls[index].name}</span>
+                                    <span cls="pra">${project}</span>
+                                    <span>${cls[index].leftDate.hour}:${cls[index].leftDate.minute} / ${cls[index].rightDate.hour}:${cls[index].rightDate.minute}</span>
+                                    <span>${cls[index].ostadUsername} </span>${publicz}
+                                    <a class="${cls[index].situation}"></a>
+                                    <p hidden>${cls[index].id}</p>
+
+                            </li>`);
+            });
+        }
+        else{
+            let colorClass = color || "white";
+
+            if(cls.length === 1) {
+                $(".classList").append(`
+                  <li class="eachClass ${colorClass}" id="class-${cls[0].classId}">
+                          <span class="weekDay"> ${cls[0].classId}  </span>
+                          <span>${cls[0].name}</span>
+                          <span>${cls[0].ostadUsername} </span>
+                          <a class="${cls[0].situation}"></a>
+                          <p hidden>${cls[0].id}</p>
+
+                  </li>`);
+            }
+        }
+    }
+
+    $("body").on("click","a.close",function(){
+        if(me.role === "admin" || me.role === "superuser") {
+            $.ajax({
+                url: "/client/adminCommand",
+                method: "post",
+                data: {
+                    id: $(this).siblings("p")[0].innerHTML.split("/")[0],
+                    classId: parseInt($(this).siblings("span")[0].innerHTML),
+                    command: "open"
+                },
+                success: function (res) {
+                    if (!res.message) {
+                        $(this).addClass("open").removeClass("close");
+                        setTimeout(function () {
+                            getNumberClasses();
+                        }, 500);
+                    }
+                    else {
+                        alert(res.message);
+                    }
+                },
+                timeout: function (res) {
+                    alert("Server did not response" + res);
+                }
+            });
+        }
+    });
+    $("body").on("click","a.open",function(){
+        let element = $(this);
+        if(me.role === "admin" || me.role === "superuser") {
+            $.ajax({
+                url: "/client/adminCommand",
+                method: "post",
+                data: {
+                    id: $(this).siblings("p")[0].innerHTML.split("/")[0],
+                    classId: parseInt($(this).siblings("span")[0].innerHTML),
+                    command: "close"
+                },
+                success: function (res) {
+
+                    if (!res.message) {
+                        element.addClass("close").removeClass("open");
+                        setTimeout(function () {
+                            getNumberClasses();
+                        }, 500);
+                    }
+                    else {
+                        alert(res.message);
+                    }
+                },
+                timeout: function (res) {
+                    alert("Server did not response" + res);
+                }
+            });
+        }
+    });
+
+
+    function getNumberClasses(){
+
+        $("#admin .clsList").html("");
+        $.ajax({
+            url:"/client/getNumberClasses",
+            method:"GET",
+            beforeSend:function(){
+            },
+            success:function(res){
+
+                $("#admin").addClass("show");
+                if (res.length > 0) {
+                    $.each(res,function(index,data) {
+                        if(res[index].ostadUsername !=="") {
+                            $("#admin .clsList").append(`
+                                <li class="eachClass" id="class-${res[index].classId}">
+                                        <span class="weekDay"> ${res[index].classId}  </span>
+                                        <span>${res[index].name}</span>
+                                        <span >${res[index].leftDate.hour}:${res[index].leftDate.minute} / ${res[index].rightDate.hour}:${res[index].rightDate.minute}</span>
+                                        <a class="${res[index].situation}"></a>
+                                        <p hidden>${res[index].classId}</p>
+                                </li> `);
+                        }
+                        else{
+                            $("#admin .clsList").append(`
+                                <li class="eachClass" id="class-${res[index].classId}">
+                                        <span class="weekDay"> ${res[index].classId}  </span>
+                                        <span>${res[index].name}</span>
+                                        <a class="${res[index].situation}"></a>
+                                        <p hidden>${res[index].classId}</p>
+                                </li>`);
+                        }
+                    });
+                }
+                else{
+                    $("#admin .clsList").html(`
+                           <li class="eachClass">
+                                <span></span>
+                                 <span>No class is available right now</span>
+                            </li>
+                         `);
+                }
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+
+    }
+    function logoutAndRefresh(){
+        $.ajax({
+            url:"/client/logout",
+            method:"POST",
+            beforeSend:function(){
+                $("#admin .classList").html("");
+            },
+            success:function(res){
+                if(res === true) {
+                    window.location.reload();
+                }
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+    }
+    function getAllUsers(){
+        $("#admin .usrList").html("");
+        $.ajax({
+            url: "/client/getUsers",
+            method: "GET",
+            beforeSend:function(){
+                $("#admin .usrList").html("");
+            },
+            success: function (res) {
+                if (!res.message) {
+
+                    if (res.length > 0) {
+                        $.each(res, function (index, data) {
+                            $("#admin .usrList").append(`
+                                <li class="eachUser" id="user-${res[index].username}">
+                                <span>${res[index].username}</span>
+                                <span>${res[index].role}</span>
+                                <button class="sample rfid" title="Get RFID Sample"></button>
+                                <button class="sample finger" title="Get Fingerprint Sample"></button>
+                                </li>
+                            `);
+                        });
+                    }
+                    else{
+                        $("#admin .usrList").append(`
+                           <li class="eachUser">
+                                <span>No user defined !</span>
+                            </li>
+                         `);
+                    }
+                }
+            },
+            fail:function(){
+                alert("No connection to server");
+            },
+            timeout:function(){
+                alert("No connection to server");
+            }
+        });
+    }
+    function initialAdminButtons(){
+        $(".clientButtons .on").removeClass("activate");
+        $(".clientButtons .on").addClass("activateAdmin");
+        $(".clientButtons .on").addClass("show");
+        $(".clientButtons .off").addClass("show");
+				$(".clientButtons .on2").removeClass("show");
+        $(".clientButtons .off2").removeClass("show");
+				$(".clientButtons .on2").removeClass("activate");
+        $(".clientButtons .off2").removeClass("activate");
+        $(".clientButtons .off").removeClass("activate");
+        $(".clientButtons .off").addClass("activateAdmin");
+        $(".clientButtons .off").html(" Users ");
+        $(".clientButtons .on").html("  Classes ");
+    }
+
+    function sampleState(element,type){
+        var x = {
+            username: username,
+            type:type
+        };
+        $.ajax({
+            url: "/client/takeSampleState",
+            method: "POST",
+            data: x,
+            beforeSend:function(){
+                turnButton(element);
+            },
+            success: function (res) {
+                clearInterval(turnInterval);
+                alert(res.message);
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+    }
+    function turnButton(element){
+        turnInterval = setInterval(function(){
+            if(element[0].className.split("turn").length === 1){
+                element.addClass("turn");
+            }
+            else{
+                element.removeClass("turn");
+            }
+        },500);
+    }
+
+</script>
+</html>
+ 

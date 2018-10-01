@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Entrance</title>
+    <script src="../javascripts/jquery.min.js"></script>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script src="../javascripts/cookies.js"></script>
+</head>
+<body>
+
+<div class="pageContainer">
+    <div class="nav">
+        <h1>Smart Entrance</h1>
+        <button id="giot" title="Green IOT"></button>
+        <button id="logo" title="logo"></button>
+        <button id="logout" title="Logout"></button>
+    </div>
+
+    <div id="alertTop">
+        <h3></h3>
+    </div>
+    <div class="container show" id="users">
+        <div class="addUser">
+            <h3>Add Admin</h3>
+            <form action="/">
+                <input type="text" placeholder="username" class="username">
+                <input type="text" placeholder="full name" class="fullName">
+                <input type="password" placeholder="password" class="password">
+                <button class="submitUser">Submit</button>
+            </form>
+        </div>
+        <div class="listContainer">
+            <div class="header">
+                <h3>Users</h3>
+                <button class="newUser" title="Add New Admin"></button>
+                <button class="reload" title="Reload"></button>
+            </div>
+            <ul class="userList">
+
+            </ul>
+        </div>
+    </div>
+    </div>
+    <div id="box">
+        <h3></h3>
+        <button class="cancel">Cancel</button>
+        <button class="ok">Ok</button>
+    </div>
+</div>
+</body>
+
+
+
+<script>
+
+    var username = "";
+    var lastUserName="";
+
+    $(document).ready(function(){
+        loadUsers();
+    });
+
+    $("body").on("submit","#users form",function(event){
+        event.preventDefault();
+    });
+    $("body").on("click",".submitUser",function(){
+        submitUser();
+    });
+    $("body").on("click","#logout",function(){
+        logout();
+        window.location.pathname = "/";
+    });
+
+    $("body").on("click","#users .header .newUser",function(){
+        $(".addUser").slideDown(300);
+        $(this).removeClass("newUser");
+        $(this).addClass("close");
+        $(".addUser h3").html("Add User");
+    });
+    $("body").on("click","#users .header .close",function(){
+        $(".addUser").slideUp(300);
+        $(this).removeClass("close");
+        $(this).addClass("newUser");
+    });
+
+    $("body").on("click",".addUser .cancel",function(){
+        $("#users close").click();
+        $("#users form .password").val("");
+    });
+
+    $("body").on("click","#users .sample.rfid",function(){
+        username = $(this).siblings("span").html();
+        sampleState($(this),"rfid");
+    });
+    $("body").on("click","#users .sample.finger",function(){
+        username = $(this).siblings("span").html();
+        sampleState($(this),"finger");
+    });
+
+    $("body").on("click",".deleteUser",function(){
+        username = $(this).siblings("span").html();
+        $("#box").show(300);
+        $("#box h3").html(`
+             Are you sure you want to delete user ${username} ?
+        `);
+        $("#box").removeClass("class");
+        $("#box").addClass("user");
+    });
+
+    $("body").on("click","#users .reload",function(){
+        loadUsers();
+        if(this.className === "reload"){
+            $(this).addClass("turn");
+        }
+        else if(this.className === "reload turn"){
+            $(this).removeClass("turn");
+        }
+        else{
+            console.log("Did not turn");
+        }
+    });
+
+    $("body").on("click","#box .cancel",function(){
+        $("#box").removeClass("user");
+        $("#box").hide(400);
+        username = "";
+        classid = "";
+    });
+    $("body").on("click","#box.user .ok",function(){
+        deleteUser();
+        $("#box").hide(400);
+        $("#box").removeClass("user");
+    });
+
+    function submitUser(){
+        var x = {
+            username: $("form .username").val(),
+            password :$("form .password").val()
+        };
+        $.ajax(
+            {
+                url: "/superuser/registerAdmin",
+                method: "POST",
+                data: x,
+                beforeSend: function () {
+
+                },
+                success: function (res) {
+                    if (!res.message) {
+                        if($(".userList li span:first-child").html().startsWith("No")){
+                            $(".userList").html("");
+                        }
+                        $(".userList").append(`
+                            <li class="eachUser" id="user-${x.username}">
+                                <span>${x.username}</span>
+                                <span>${x.fullName}</span>
+                                <span>${x.role}</span>
+                                <button class="deleteUser" title="Delete User"></button>
+                                <button class="sample rfid" title="Get RFID Sample"></button>
+                                <button class="sample finger" title="Get Fingerprint Sample"></button>
+                            </li>
+                        `);
+                        window.location.pathname = "/superuser";
+                    }
+                    else {
+                        alert(res.message);
+                    }
+                },
+                fail: function () {
+                    alert("No connection to server");
+                },
+                timeout: function () {
+                    alert("No connection to server");
+                }
+            }
+        );
+
+    }
+    function loadUsers() {
+
+        $.ajax({
+            url: "/superuser/getAdmins",
+            method: "GET",
+            beforeSend:function(){
+                $(".userList").html("");
+            },
+            success: function (res) {
+                if (!res.message) {
+                    if (res.length > 0) {
+                        $.each(res, function (index, data) {
+                            $(".userList").append(`
+                                <li class="eachUser" id="user-${res[index].username}">
+                                <span>${res[index].username}</span>
+                                <span>${res[index].fullName}</span>
+                                <span>${res[index].role}</span>
+                                <button class="deleteUser" title="Delete User"></button>
+                                <button class="sample rfid" title="Get RFID Sample"></button>
+                                <button class="sample finger" title="Get Fingerprint Sample"></button>
+                                </li>
+                            `);
+                        });
+                    }
+                    else{
+                        $(".userList").append(`
+                           <li class="eachUser">
+                                <span>No user defined !</span>
+                            </li>
+                         `);
+                    }
+                }
+            },
+            fail:function(){
+                alert("No connection to server");
+            },
+            timeout:function(){
+                alert("No connection to server");
+            }
+        });
+    }
+
+    function deleteUser() {
+        var x = {
+            username: username
+        };
+        $.ajax({
+            url: "/admin/deleteUser",
+            method: "POST",
+            data: x,
+            success: function (res) {
+                if (!res.message) {
+                    $(`#user-${x.username}`).slideDown(300,function(){
+
+                        $(`#user-${x.username}`).remove();
+                    });
+                    $(".addUser").slideUp(300);
+                    alert("User " + username + " Deleted Successfully !");
+                }
+                else {
+                    alert(res.message);
+                }
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+    }
+    function sampleState(element,type){
+        let x = {
+            username: username,
+            type:type
+        };
+        turnButton(element);
+        $.ajax({
+            url: "/admin/takeSampleState",
+            method: "POST",
+            data: x,
+            beforeSend:function(){
+            },
+            success: function (res) {
+                clearInterval(turnInterval);
+                alert(res.message);
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+    }
+    function turnButton(element){
+        turnInterval = setInterval(function(){
+            if(!element[0].className.split(" ")[2]){
+                element.addClass("turn");
+            }
+            else{
+                element.removeClass("turn");
+            }
+        },500);
+    }
+    function alert(message){
+        $("#alertTop h3").html(message);
+        $("#alertTop").addClass("show");
+        setTimeout(function (){
+            $("#alertTop").removeClass("show");
+            // Something you want delayed.
+        }, 5000); // 5seconds show
+    }
+
+    function logout(){
+        eraseCookie("KEY");
+        eraseCookie("X-ACCESS-TOKEN");
+        window.location.pathname= "/";
+    }
+</script>
+</html>

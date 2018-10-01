@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Entrance</title>
+    <script src="../javascripts/jquery.min.js"></script>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <script src="../javascripts/cookies.js"></script>
+</head>
+<body>
+
+<div class="pageContainer">
+    <div class="nav">
+        <h1>Smart Entrance</h1>
+        <button id="giot" title="Green IOT"></button>
+        <button id="logout" title="Logout"></button>
+        <button id="logo"title="Logo"></button>
+        <button id="logs" class="on" title="Logs"></button>
+    </div>
+    <div id="alertTop">
+        <h3></h3>
+    </div>
+<!--chap-->
+    <div class="container show" id="users">
+        <div class="addUser">
+            <h3>Add User</h3>
+            <input type="text" placeholder="username" class="username">
+            <select class="role">
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+            </select>
+            <button class="submitUser">Submit</button>
+        </div>
+        <div class="listContainer">
+            <div class="header">
+                <h3>Users</h3>
+                <input type="text" class="searchUserInput">
+                <button class="newUser" title="Add New User"></button>
+                <button class="reload" title="Reload"></button>
+                <button class="searchBtn" title="Search Users"></button>
+            </div>
+            <ul class="userList">
+
+            </ul>
+        </div>
+    </div>
+<!--rast -->
+    <div class="container show" id="classes">
+        <div class="addClass">
+            <h3>Add Class</h3>
+            <input type="text" placeholder="name" class="className">
+            <input type="number" placeholder="class id" class="classId"><br>
+            <div class="dayy">
+            <span>Day</span>
+            <select class="day">
+                <option value="Sat">Saturday</option>
+                <option value="Sun">Sunday</option>
+                <option value="Mon">Monday</option>
+                <option value="Tue">Tuesday</option>
+                <option value="Wed">Wednesday</option>
+                <option value="Thu">Thursday</option>
+                <option value="Fri">Friday</option>
+                <option value="All">All</option>
+            </select>
+            </div>
+            <div class="left">
+                <span>Start Time</span>
+                <select class="minute">
+
+                </select>
+                <select class="hour">
+
+                </select>
+            </div>
+            <div class="right">
+                <span>End Time</span>
+                <select class="minute">
+
+                </select>
+                <select class="hour">
+
+                </select>
+            </div>
+            <p>Access Project Room <input type="checkbox" class="accessProject" name="accessProject" />
+            </p>
+            <p>Public Class <input type="checkbox" class="isPublic" name="isPublic" />
+            </p>
+            <button class="submitClass">Submit</button>
+        </div>
+        <div class="listContainer">
+            <div class="header">
+                <h3>Classes</h3>
+                <input type="number" class="classNumber">
+                <select class="classDay">
+                    <option value="">All</option>
+                    <option value="Sat">Sat</option>
+                    <option value="Sun">Sun</option>
+                    <option value="Mon">Mon</option>
+                    <option value="Tue">Tue</option>
+                    <option value="Wed">Wed</option>
+                    <option value="Thu">Thu</option>
+                    <option value="Fri">Fri</option>
+                </select>
+                <button class="newClass" title="Add New Class"></button>
+                <button class="reload" title="Reload">
+                <button class="classified" title="Classified classes"></button>
+                </button>
+            </div>
+            <ul class="classList">
+
+            </ul>
+        </div>
+    </div>
+    <div class="container clientMonitor" id="monitor">
+        <h2>Classes</h2>
+        <ul class="classList">
+
+        </ul>
+    </div>
+    <div class="container logs clientMonitor" id="logsForm">
+        <h2>Logs Panel</h2>
+        <select>
+            <option value="1"> last day </option>
+            <option value="7"> last week </option>
+            <option value="31"> last month </option>
+            <option value="93"> last season </option>
+            <option value="365"> last year </option>
+            <option value="0"> All </option>
+        </select>
+        <button id="printLogs"> System Full Logs </button>
+        <button id="printPresence"> Users Presence </button>
+    </div>
+</div>
+
+    <div id="box">
+        <h3></h3>
+        <button class="cancel">Cancel</button>
+        <button class="ok">Ok</button>
+    </div>
+</div>
+</body>
+
+
+
+<script>
+
+    var username = "";
+    var classid = "";
+    var lastUserName="";
+    var submitMode = "create";
+    var turnInterval = null;
+    var classNumber = 0;
+    var classDay = "";
+    var searchUser = "";
+    var lastRole = "";
+    var deletingClasses = [];
+    var studentsView = false;
+
+    $(document).ready(function(){
+        loadClasses(); // get All
+        loadUsers();
+        initialClocks();
+        showUserHeader();
+        showClassHeader();
+        setTimeout(function(){
+            getNumberClasses();
+        },50);
+        setInterval(function(){
+            getNumberClasses();
+        },10000);
+
+    });
+    $("body").on("click","#printLogs",function(){
+        $.ajax({
+           url:"/admin/getLogs",
+           method:"POST",
+           data:{
+                timeEdge : parseInt($(".logs select").val())
+           },
+            success: function(result) {
+                if(!result.message) {
+                    window.location.pathname="/logs/"+result;
+                }
+                else{
+                    alert(result.message);
+                }
+            }
+                // URL.revokeObjectURL(url)
+                // };
+        });
+    });
+    $("body").on("click","#printPresence",function(){
+        $.ajax({
+           url:"/admin/getPresents",
+           method:"POST",
+           data:{
+                timeEdge : parseInt($(".logs select").val())
+           },
+            success: function(result) {
+                if (!result.message) {
+                    window.location.pathname = "/logs/" + result;
+                }
+                else {
+                    alert(result.message);
+                }
+            }
+        });
+    });
+    $("body").on("click","#logs.on",function(){
+       $("#monitor").addClass("show");
+       $("#logsForm").addClass("show");
+        $("#classes").removeClass("show");
+        $("#users").removeClass("show");
+       $(this).addClass("off").removeClass("on");
+
+    });
+    $("body").on("click","#logs.off",function(){
+        $("#classes").addClass("show");
+        $("#users").addClass("show");
+        $("#monitor").removeClass("show");
+        $("#logsForm").removeClass("show");
+
+        $(this).addClass("on").removeClass("off");
+    });
+    $("body").on("click",".submitUser",function(){
+        submitUser();
+        studentsView = false;
+    });
+    $("body").on("click",".submitClass",function(){
+        if(username !== "") {
+            submitClass();
+        }
+        else {
+            alert("Choose a user first");
+        }
+        studentsView = false;
+    });
+    $("body").on("click","#logout",function(){
+        logout();
+        window.location.pathname = "/";
+    });
+    $("body").on("click",".eachUser .editUser",function(){
+        $(".addUser").slideDown(300);
+        username  = $(this).siblings("span").html();
+        lastUserName = username;
+        $(".role").val($(this).siblings("span")[1].innerHTML);
+        getUserInfos();
+        submitMode = "edit";
+        let element = $(".newUser");
+        element.addClass("close");
+        $(".addUser h3").html("Edit User : " + lastUserName);
+        studentsView = false;
+    });
+    $("body").on("click",".eachUser .rightArrow.teacher",function(){ // do on roles 
+        $(".addUser").slideUp(300);
+        if($(".newClass.close"))
+            $(".newClass.close").click();
+        username  = $(this).siblings("span").html();
+        lastUserName = username;
+        lastRole = $(this).siblings("span")[1].innerHTML;
+        loadClasses();
+        $("#classes .header h3").html(" "+username + "\n Assigned Classes ");
+        $(".laodHome").show(300);
+        studentsView = false;
+    });
+    $("body").on("click",".eachUser .rightArrow.student",function(){ // find public class includes studentsList {$in:[]}
+        $(".addUser").slideUp(300);
+        if($(".newClass.close"))
+            $(".newClass.close").click();
+        username  = $(this).siblings("span").html();
+        lastRole = $(this).siblings("span")[1].innerHTML;
+        lastUserName = username;
+        loadClasses(true);
+        $("#classes .header h3").html(" "+username + "\n Assigned Classes ");
+        $(".laodHome").show(300);
+        studentsView = false;
+    });
+    $("body").on("click",".loadHome",function(){
+        $(".addUser").slideUp(300);
+        $(".addClass").slideUp(300);
+        username  = "";
+        lastUserName = "";
+        loadClasses();
+        $("#classes .header h3").html("Classes :");
+        $(".loadHome").hide(300);
+        studentsView = false;
+    });
+    $("body").on("click",".eachClass .studentsCounts",function() {
+        classid  = $(this).siblings("p").html();
+        lastUserName = $(this).siblings("span")[1].innerHTML.split(": ")[1].split(" ")[0];
+        let className = $(this).siblings("span")[0].innerHTML;
+        username = lastUserName;
+        getClassInfos(true,className);
+        studentsView = true;
+
+    });
+    $("body").on("click",".eachClass .assign",function(){
+        classid  = $(this).siblings("p").html();
+        assignUserToPublicClass(classid,username,true);
+    });
+    $("body").on("click",".eachClass .remove",function(){
+        classid  = $(this).siblings("p").html();
+        assignUserToPublicClass(classid,username,false);
+    });
+    $("body").on("click",".eachClass .editClass",function(){
+        classid  = $(this).siblings("p").html();
+        lastUserName = $(this).siblings("span")[1].innerHTML.split(": ")[1].split(" ")[0];
+        username = lastUserName;
+        $(".addClass").slideDown(300);
+        getClassInfos();
+        submitMode = "edit";
+        var element = $(".newClass");
+        element.addClass("close");
+        $(".addClass h3").html("Edit Class");
+    });
+
+    $("body").on("click","#users .header .newUser",function(){
+        $(".addUser").slideDown(300);
+        $(this).addClass("close");
+        submitMode = "create";
+        $(".addUser h3").html("Add User");
+        $(".addUser .username").val("");
+    });
+
+    $("body").on("click","#users .header .newUser.close",function(){
+        $(".addUser").slideUp(300);
+        $(this).removeClass("close");
+    });
+
+    $("body").on("click","#classes .header .newClass",function(){
+        if(lastRole === "student"){
+            loadClasses(false)
+        }
+        else {
+            $(".addClass").slideDown(300);
+            $(this).addClass("close");
+            submitMode = "create";
+            $(".addClass h3").html("Add Class");
+            $(".addClass .classNumber").val("");
+            $(".addClass .classDay").val("");
+            $(".addClass .className").val("");
+        }
+    });
+
+    $("body").on("click","#classes .header .newClass.close",function(){
+        $(".addClass").slideUp(300);
+        $(this).removeClass("close");
+    });
+
+
+
+
+    $("body").on("click",".addClass .cancel",function(){
+        $("#classes .close").click();
+    });
+    $("body").on("click",".addUser .cancel",function(){
+        $("#users close").click();
+    });
+
+
+    $("body").on("click",".deleteUser",function(){
+        if(studentsView) {
+            if (this.className.split("student").length > 1) {
+                username = $(this).siblings("span")[0].innerHTML;
+                lastUserName = username;
+                assignUserToPublicClass(classid, username, false, true);
+            }
+        }
+        else{
+            username = $(this).siblings("span").html();
+            lastRole = $(this).siblings("span:nth-child(2)").html();
+
+            $("#box").show(300);
+            $("#box h3").html(`
+             Are you sure you want to delete user ${username} ?
+        `);
+            $("#box").removeClass("class");
+            $("#box").addClass("user");
+        }
+        studentsView = false;
+
+    });
+
+    $("body").on("click",".deleteClass",function(){
+        classid  = $(this).siblings("p")[0].innerHTML;
+        $("#box h3").html(`
+           Are you sure you want to delete class ${classid} ?
+        `);
+        $("#box").show(300);
+        $("#box").removeClass("user");
+        $("#box").addClass("class");
+        studentsView = false;
+    });
+
+    $("body").on("click","#classes .reload",function(){
+        loadClasses();
+        if(this.className === "reload"){
+            $(this).addClass("turn");
+        }
+        else if(this.className === "reload turn"){
+            $(this).removeClass("turn");
+        }
+        else{
+            console.log("Did not turn");
+        }
+    });
+
+    $("body").on("click","#users .reload",function(){
+        loadUsers();
+        if(this.className === "reload"){
+            $(this).addClass("turn");
+        }
+        else if(this.className === "reload turn"){
+            $(this).removeClass("turn");
+        }
+        else{
+            console.log("Did not turn");
+        }
+    });
+
+    $("body").on("click","#box .cancel",function(){
+        $("#box").removeClass("user");
+        $("#box").removeClass("class");
+        $("#box").hide(400);
+        username = "";
+        classid = "";
+    });
+    $("body").on("click","#box.user .ok",function(){
+        deleteUser();
+        $("#box").hide(400);
+        $("#box").removeClass("user");
+        $("#box").removeClass("class");
+    });
+    $("body").on("click","#box.class .ok",function(){
+        deleteClass();
+        $("#box").hide(400);
+        $("#box").removeClass("user");
+        $("#box").removeClass("class");
+    });
+
+
+    $("body").on("click","#users .sample.rfid",function(){
+        username = $(this).siblings("span").html();
+        sampleState($(this),"rfid");
+    });
+    $("body").on("click","#users .sample.finger",function(){
+        username = $(this).siblings("span").html();
+        sampleState($(this),"finger");
+    });
+    $("body").on("click",".classified",function(){
+        showClassified();
+        $(this).addClass("close");
+    });
+    $("body").on("click",".searchBtn",function(){
+        showSearch();
+        $(this).addClass("close");
+    });
+
+
+    $("body").on("click",".classified.close",function(){
+        showClassHeader();
+        lastUserName = "";
+        username = "";
+        loadClasses();
+        $(this).removeClass("close");
+    });
+    $("body").on("click",".searchBtn.close",function(){
+        showUserHeader();
+        loadUsers();
+        $(this).removeClass("close");
+    });
+
+
+    $("body").on("change",".searchUserInput.show",function(){
+        searchUser = $(this).val();
+        if(searchUser !== "") {
+            searchUsers();
+        }
+    });
+    $("body").on("change",".classNumber.show",function(){
+        if($(this).val() !== "") {
+            classNumber = parseInt($(this).val());
+            if (isNaN(classNumber)) {
+                classNumber = 0;
+            }
+        }
+        else{
+            classNumber = 0;
+        }
+        getClassifiedClasses();
+    });
+    $("body").on("change",".classDay.show",function(){
+        if($(".classDay.show").val() !== "") {
+            classDay = parseInt($(this).val());
+            if (isNaN(classDay)) {
+                classDay = "";
+            }
+        }
+        else{
+            classDay = "";
+        }
+        classDay = $(this).val();
+        getClassifiedClasses();
+    });
+    $("body").on("click","a.close",function(){
+
+        $.ajax({
+            url:"/admin/adminCommand",
+            method:"post",
+            data:{
+                id:$(this).siblings("p")[0].innerHTML.split("/")[0],
+                classId:parseInt($(this).siblings("span")[0].innerHTML),
+                command:"open"
+            },
+            success:function(res){
+                if(!res.message) {
+                    $(this).addClass("open").removeClass("close");
+                    setTimeout(function() {
+                        getNumberClasses();
+                    },500);
+                }
+                else{
+                 alert(res.message);
+                }
+            },
+            timeout:function(res){
+              alert("Server did not response" + res);
+            }
+        });
+
+    });
+    $("body").on("click","a.open",function(){
+        $.ajax({
+            url:"/admin/adminCommand",
+            method:"post",
+            data:{
+                id:$(this).siblings("p")[0].innerHTML.split("/")[0],
+                classId:parseInt($(this).siblings("span")[0].innerHTML),
+                command:"close"
+            },
+            success:function(res){
+                if(!res.message) {
+                    $(this).addClass("close").removeClass("open");
+                    setTimeout(function() {
+                        getNumberClasses();
+                    },500);
+                }
+                else{
+                    alert(res.message);
+                }
+            },
+            timeout:function(res){
+                alert("Server did not response" + res);
+            }
+        });
+    });
+    function getNumberClasses(){
+
+        $.ajax({
+            url:"/client/getNumberClasses",
+            method:"GET",
+            beforeSend:function(){
+
+            },
+            success:function(res){
+                let numbers = [];
+                $("#monitor .classList").html("");
+                if (res.length > 0) {
+                    $.each(res,function(index,data) {
+                        if(res[index]){
+                            if(numbers.indexOf(res[index].classId) > -1){
+                                if(res[index].leftDate.minute === 0){
+                                    res[index].leftDate.minute = "00";
+                                }
+                                if(res[index].rightDate.minute === 0){
+                                    res[index].rightDate.minute = "00";
+                                }
+
+                                $(`#class-${res[index].classId}`).html("");
+                                $(`#class-${res[index].classId}`).html(`
+                                    <span class="weekDay"> ${res[index].classId}  </span>
+                                    <span>${res[index].name}</span>
+                                    <span>${res[index].ostadUsername}</span>
+                                    <span>
+                                        ${res[index].leftDate.hour}:${res[index].leftDate.minute} / ${res[index].rightDate.hour}:${res[index].rightDate.minute}
+                                    </span>
+                                    <a class="${res[index].situation}"></a>
+                                    <p hidden>${res[index].classId}</p>
+                                `);
+                            }
+                            else{
+                                numbers.push(res[index].classId);
+                                if(res[index].ostadUsername !=="") {
+                                    $("#monitor .classList").append(`
+                                        <li class="eachClass" id="class-${res[index].classId}">
+                                            <span class="weekDay"> ${res[index].classId}  </span>
+                                            <span>${res[index].name}</span>
+                                            <span>${res[index].ostadUsername}</span>
+                                            <span>
+                                                ${res[index].leftDate.hour}:${res[index].leftDate.minute} / ${res[index].rightDate.hour}:${res[index].rightDate.minute}
+                                            </span>
+                                            <a class="${res[index].situation}"></a>
+                                            <p hidden>${res[index].classId}</p>
+
+                                        </li>
+                                    `);
+                                }
+                                else{
+                                    $("#monitor .classList").append(`
+                                        <li class="eachClass" id="class-${res[index].classId}">
+                                                <span class="weekDay"> ${res[index].classId}  </span>
+                                                <a class="${res[index].situation}"></a>
+                                                <p hidden>${res[index].classId}</p>
+
+                                        </li>
+                                    `);
+                                }
+                            }
+                        }
+                    });
+                }
+                else{
+                    $("#monitor .classList").html(`
+                           <li class="eachClass">
+                                <span>No class defined yet!</span>
+                            </li>
+                         `);
+                }
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+
+    }
+
+    function submitUser(){
+        if (submitMode === "create") {
+            var x = {
+                username: $(".username").val(),
+                role :$(".role").val()
+            };
+            $.ajax(
+                {
+                    url: "/admin/addUser",
+                    method: "POST",
+                    data: x,
+                    beforeSend: function () {
+
+                    },
+                    success: function (res) {
+                        if (!res.message) {
+                            if($(".userList li span:first-child").html().startsWith("No")){
+                                $(".userList").html("");
+                            }
+                            $(".userList").append(`
+                                <li class="eachUser" id="user-${x.username.split(" ").join("-")}">
+                                    <span>${x.username}</span>
+                                    <span>${x.role}</span>
+                                    <button class="rightArrow ${x.role}" title="Show User"></button>
+                                    <button class="sample rfid" title="Get RFID Sample"></button>
+                                    <button class="sample finger" title="Get Fingerprint Sample"></button>
+                                    <button class="editUser" title="Edit User"></button>
+                                    <button class="deleteUser" title="Delete User"></button>
+                                </li>
+                            `);
+                            $("#users .close").click();
+                            $(".addUser").slideUp(300);
+                        }
+                        else {
+                            alert(res.message);
+                        }
+                    },
+                    fail: function () {
+                        alert("No connection to server");
+                    },
+                    timeout: function () {
+                        alert("No connection to server");
+                    }
+                }
+            );
+        }
+        else if(submitMode === "edit"){
+
+            let x = {
+                newUsername:$(".username").val(),
+                username: lastUserName,
+                role :$(".role").val()
+            };
+            $.ajax(
+                {
+                    url: "/admin/editUser",
+                    method: "POST",
+                    data: x,
+                    beforeSend: function () {
+
+                    },
+                    success: function (res) {
+                        if (!res.message) {
+                            $(`#user-${lastUserName.split(" ").join("-")}`).remove();
+                            $(".userList").prepend(`
+                                <li class="eachUser" id="user-${x.username.split(" ").join("-")}">
+                                    <span>${x.username}</span>
+                                    <span>${x.role}</span>
+                                    <button class="rightArrow ${x.role}" title="Show User"></button>
+                                    <button class="sample rfid" title="Get RFID Sample"></button>
+                                    <button class="sample finger" title="Get Fingerprint Sample"></button>
+                                    <button class="editUser" title="Edit User"></button>
+                                    <button class="deleteUser" title="Delete User"></button>
+                                </li>
+                            `);
+                            $("#users .close").click();
+                            alert("user " + username + " Successfully Updated !");
+                        }
+                        else {
+                            alert(res.message);
+                        }
+                    },
+                    fail: function () {
+                        alert("No connection to server");
+                    },
+                    timeout: function () {
+                        alert("No connection to server");
+                    }
+                }
+            );
+        }
+    }
+    function loadUsers(list) {
+
+        if(!list) {
+
+            $.ajax({
+                url: "/client/getUsers",
+                method: "GET",
+                beforeSend: function () {
+                    $(".userList").html("");
+                },
+                success: function (res) {
+                    if (!res.message) {
+                        parseUsersList(res);
+                    }
+                },
+                fail: function () {
+                    alert("No connection to server");
+                },
+                timeout: function () {
+                    alert("No connection to server");
+                }
+            });
+        }
+    }
+    function parseUsersList(list,classId,className){
+        $(".userList").html("");
+        if(classId){
+            $("#users .header h3").html('class : "' + className + '" students');
+            if (list.length > 0) {
+                $.each(list, function (index, data) {
+                    $(".userList").append(`
+                                <li class="eachUser" id="user-${list[index].split(" ").join("-")}">
+                                <span>${list[index]}</span>
+                                <span>student</span>
+                                <button class="deleteUser student" title="Delete User"></button>
+                                </li>
+                            `);
+                });
+            }
+            else {
+                $(".userList").append(`
+                           <li class="eachUser">
+                                <span>No user defined !</span>
+                            </li>
+                         `);
+            }
+        }
+        else{
+            $("#users .header h3").html("Users");
+            if (list.length > 0) {
+                $.each(list, function (index, data) {
+                    $(".userList").append(`
+                                <li class="eachUser" id="user-${list[index].username.split(" ").join("-")}">
+                                <span>${list[index].username}</span>
+                                <span>${list[index].role}</span>
+                                <button class="rightArrow ${list[index].role}" title="Show User"></button>
+                                <button class="sample rfid" title="Get RFID Sample"></button>
+                                <button class="sample finger" title="Get Fingerprint Sample"></button>
+                                <button class="editUser" title="Edit User"></button>
+                                <button class="deleteUser ${list[index].role}" title="Delete User"></button>
+                                </li>
+                            `);
+                });
+            }
+            else {
+                $(".userList").append(`
+                           <li class="eachUser">
+                                <span>No user defined !</span>
+                            </li>
+                         `);
+            }
+        }
+    }
+    function submitClass() {
+        let projectRoom = null;
+        let isPublic = false;
+        if($(".accessProject:checked")[0]){
+            projectRoom = 202;
+        }
+        if($(".isPublic:checked")[0]){
+            isPublic = true;
+        }
+        if (submitMode === "create") {
+            let x={};
+            if(parseInt($(".classId").val()) !== 202) {
+                x = {
+                    leftHour: parseInt($(".left .hour").val()),
+                    leftMinute: parseInt($(".left .minute").val()),
+                    rightHour: parseInt($(".right .hour").val()),
+                    rightMinute: parseInt($(".right .minute").val()),
+                    username: username,
+                    name: $(".className").val(),
+                    project: projectRoom,
+                    isPublic: isPublic,
+                    classId: parseInt($(".classId").val()),
+                    day: $(".day").val(),
+                };
+            }
+            else{
+                x = {
+                    classId:parseInt($(".classId").val())
+                }
+            }
+            $.ajax({
+                url: "/admin/addClass",
+                method: "POST",
+                data: x,
+                success: function (res) {
+                    if (!res.message) {
+                        if($(".classList li span:first-child").html().startsWith("No")){
+                            $(".classList").html("");
+                        }
+                        let publicz = ``;
+                        let project = ``;
+                        let classNumber = "";
+                        if(res.classId === 206){
+                            classNumber = "206 (206-A)";
+                        }
+                        else if(res.classId === 226){
+                            classNumber = "226 (206-B)";
+                        }
+                        else{
+                            classNumber = res.classId;
+                        }
+                        if((res.accessProject !== null) && (res.accessProject !== undefined)){
+                            project = `<button class="projectRoomIcon"></button>`;
+                        }
+                        if(res.isPublic){
+                            publicz = `<button class="publicIcon"></button>
+                                       <a class="studentsCounts">0</a>
+                                       <button class="editClass" title="Edit Class"></button>
+                                       <button class="assign" title="Assign Class"></button>
+                                       <button class="deleteClass" title="Delete Class"></button>;
+                                    `;
+                        }
+                        else{
+                            publicz = `<button class="editClass" title="Edit Class"></button>
+                                       <button class="deleteClass" title="Delete Class"></button>`;
+                        }
+                        $(".classList").append(`
+                            <li class="eachClass" id="class-${res.id}">
+                                <span>${x.name}</span>
+                                <span> User : ${res.ostadUsername} </span>
+                                <span class="weekDay">Class : ${classNumber}</span>
+                                <span class="leftTime">${res.day} | ${res.leftDate.hour}:${res.leftDate.minute}  </span>
+                                <span class="rightTime"> ${res.rightDate.hour}:${res.rightDate.minute}</span>
+                                <p hidden>${res.id}</p>${project}${publicz}
+                                <button class="editClass"></button>
+                                <button class="deleteClass"></button>
+                            </li>
+                        `);
+                        $("#classes .close").click();
+                    }
+                    else {
+                        alert(res.message);
+                    }
+                },
+                fail: function (res) {
+                    console.log(res);
+                    alert("No connection to server");
+                },
+                timeout: function () {
+                    alert("No connection to server");
+                }
+            });
+        }
+        else if(submitMode==="edit"){
+            let x = {
+                leftHour : parseInt($(".left .hour").val()),
+                leftMinute :  parseInt($(".left .minute").val()),
+                rightHour: parseInt($(".right .hour").val()),
+                rightMinute :parseInt($(".right .minute").val()),
+                ostadUsername: username,
+                id:classid,
+                project: projectRoom,
+                isPublic: isPublic,
+                name: $(".className").val(),
+                classId: parseInt($(".classId").val()),
+                day:$(".day").val(),
+            };
+            $.ajax({
+                url: "/admin/editClass",
+                method: "POST",
+                data: x,
+                beforeSend:function(){
+                    $(`#class-${x.id}`).html(``);
+                },
+                success: function (res) {
+                    if (!res.message) {
+                        let publicz = ``;
+                        let project = ``;
+                        let classNumber = "";
+                        if(res.classId === 206){
+                            classNumber = "206 (206-A)";
+                        }
+                        else if(res.classId === 226){
+                            classNumber = "226 (206-B)";
+                        }
+                        else{
+                            classNumber = res.classId;
+                        }
+                        if((res.accessProject !== null) && (res.accessProject !== undefined)){
+                            project = `<button class="projectRoomIcon"></button>`;
+                        }
+                        if((res.accessProject !== null) && (res.accessProject !== undefined)){
+                            project = `<button class="projectRoomIcon"></button>`;
+                        }
+                        if(res.isPublic){
+                            publicz = `<button class="publicIcon"></button>
+                                               <a class="studentsCounts">${res.studentsList.length}</a>
+                                               <button class="editClass" title="Edit Class"></button>
+                                               <button class="assign" title="Assign Class"></button>
+                                               <button class="deleteClass" title="Delete Class"></button>;
+                                    `;
+                        }
+                        else{
+                            publicz = `<button class="editClass" title="Edit Class"></button>
+                                               <button class="deleteClass" title="Delete Class"></button>`;
+                        }
+                        $(`#class-${x.id}`).html(`
+                                <span>${x.name}</span>
+                                <span> User : ${res.ostadUsername} </span>
+                                <span class="weekDay">Class : ${classNumber}</span>
+                                <span class="leftTime">${res.day} | ${res.leftDate.hour}:${res.leftDate.minute}  </span>
+                                <span class="rightTime"> ${res.rightDate.hour}:${res.rightDate.minute}</span>
+                                <p hidden>${res.id}</p>${project}${publicz}
+                                <button class="editClass"></button>
+                                <button class="deleteClass"></button>
+                        `);
+                        $(".newClass.close").click();
+                    }
+                    else {
+                        alert(res.message);
+                    }
+                },
+                fail: function (res) {
+                    console.log(res);
+                    alert("No connection to server");
+                },
+                timeout: function () {
+                    alert("No connection to server");
+                }
+            });
+        }
+    }
+
+    function loadClasses(publicx) {
+        let lastUserNameUsed = username;
+        let url = "getClasses";
+        if(publicx === true)
+            url = "getPublicClasses";
+        else if(publicx === false) {
+            url = "getPublicClasses";
+            lastUserNameUsed = "";
+        }
+        $.ajax({
+            url: "/admin/" + url+"/"+lastUserNameUsed,
+            method: "GET",
+            beforeSend:function(){
+                $("#classes .classList").html("");
+                $("#classes .header h3").html(" "+username + "\n Assigned Classes ");
+            },
+            success: function (res) {
+                if (!res.message) {
+                    if (res.length > 0) {
+                        let project = ``;
+                        let publicz = ``;
+                        $.each(res,function(index,data) {
+                            if(res[index].classId !== 202) {
+                                publicz = ``;
+                                project = ``;
+                                let classNumber = "";
+                                if(res[index].leftDate.minute === 0){
+                                    res[index].leftDate.minute = "00";
+                                }
+                                if(res[index].rightDate.minute === 0){
+                                    res[index].rightDate.minute = "00";
+                                }
+                                if(res[index].classId === 206){
+                                    classNumber = "206 (206-A)";
+                                }
+                                else if(res[index].classId === 226){
+                                    classNumber = "226 (206-B)";
+                                }
+                                else{
+                                    classNumber = res[index].classId;
+                                }
+                                if((res[index].accessProject !== null) && (res[index].accessProject !== undefined)){
+                                    project = `<button class="projectRoomIcon"></button>`;
+                                }
+                                if(res[index].isPublic){
+                                    publicz = `<button class="publicIcon"></button>
+                                               <a class="studentsCounts">${res[index].studentsList.length}</a>
+                                               `;
+                                    if((publicx === true) || (publicx === false)) {
+                                        if(res[index].studentsList.indexOf(lastUserName) > -1) {
+                                            publicz += ` <button class="remove" title="Remove from Class"></button>`;
+                                        }
+                                        else{
+                                            publicz += ` <button class="assign" title="Assign Class"></button>`;
+                                        }
+                                    }
+                                    else{
+                                        publicz +=`
+                                            <button class="editClass" title="Edit Class"></button>
+                                            <button class="deleteClass" title="Delete Class"></button>`;
+                                    }
+                                }
+                                else{
+                                    publicz = `<button class="editClass" title="Edit Class"></button>
+                                               <button class="deleteClass" title="Delete Class"></button>`;
+                                }
+                                $(".classList").append(`
+                                    <li class="eachClass" id="class-${res[index].id}">
+                                        <span>${res[index].name}</span>
+                                        <span> User: ${res[index].ostadUsername} </span>
+                                        <span class="weekDay"> Class: ${classNumber}</span>
+                                        <span class="leftTime">${res[index].day} | ${res[index].leftDate.hour}:${res[index].leftDate.minute}</span>
+                                        <span class="rightTime">${res[index].rightDate.hour}:${res[index].rightDate.minute}</span>
+                                        <p hidden>${res[index].id}</p>${project}${publicz}
+                                    </li>
+                                `);
+                            }
+                            else{
+                                $(".classList").append(`
+                                <li class="eachClass" id="class-${res[index].id}">
+                                    <span>${res[index].name}</span>
+                                    <span class="weekDay"> Class: ${res[index].classId} </span>
+                                    <p hidden>${res[index].id}</p>
+                                    <button class="deleteClass" title="Delete Class"></button>
+                                </li>`);
+                            }
+
+                        });
+
+                    }
+                    else{
+                        $(".classList").append(`
+                           <li class="eachClass">
+                                <span>No class defined !</span>
+                            </li>
+                         `);
+                    }
+                }
+            },
+            fail:function(res){
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout:function(){
+                alert("No connection to server");
+            }
+        });
+    }
+
+    function getUserInfos(){
+
+        $.ajax({
+            url: "/admin/getUserInfo/"+username,
+            method: "GET",
+            beforeSend: function () {
+                $(".addUser").slideDown(300);
+            },
+            success: function (res) {
+                if (!res.message) {
+                    $(".username").val(res.username);
+                }
+                else{
+                    alert(res.username);
+                }
+            },
+            fail:function(res){
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout:function(){
+                alert("No connection to server");
+            }
+        });
+    }
+
+    function getClassInfos(mode,className) {
+        $.ajax({
+            url: "/admin/getClassInfo/"+classid,
+            method: "GET",
+            beforeSend: function () {
+                if(!mode){
+                    $(".addClass").slideDown(300);
+                }
+            },
+            success: function (res) {
+                if (!res.message) {
+                    if(mode){
+                        parseUsersList(res.studentsList,classid,className);
+
+                    }
+                    else {
+                        $(".className").val(res.name);
+                        $(".classId").val(res.classId);
+                        $(".day").val(res.day);
+                        $(".left .hour").val(res.leftDate.hour);
+                        $(".left .minute").val(res.leftDate.minute);
+                        $(".right .hour").val(res.rightDate.hour);
+                        $(".right .minute").val(res.rightDate.minute);
+                        if ((res.accessProject !== null) && (res.accessProject !== undefined)) {
+                            if ($(".accessProject:checked")[0] === undefined)
+                                $(".accessProject").click();
+                        }
+                        else {
+                            if ($(".accessProject:checked") !== undefined)
+                                $(".accessProject:checked").click();
+                        }
+                        if (res.isPublic) {
+                            if (($(".isPublic:checked")[0] === undefined))
+                                $(".isPublic").click();
+                        }
+                        else {
+                            if ($(".isPublic:checked") !== undefined)
+                                $(".isPublic:checked").click();
+                        }
+                    }
+                }
+                else{
+                    alert(res.message);
+                }
+            },
+            fail:function(res){
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout:function(){
+                alert("No connection to server");
+            }
+        });
+
+    }
+    function assignUserToPublicClass(class_id,username,mode,responseAction){
+        let url = "/admin/assignStudent";
+        if(!mode){
+            url = "/admin/removeStudent";
+        }
+        $.ajax({
+            url: url,
+            method: "POST",
+            data:{
+                classId:class_id,
+                username:username
+            },
+            beforeSend: function () {
+
+            },
+            success: function (res) {
+                if (!res.message) {
+
+                    let m = 1;
+                    if(!mode)
+                        m = -1;
+                    let counts  = parseInt($(`#class-${class_id} .studentsCounts`).html()) + m;
+                    $(`#class-${class_id} .studentsCounts`).html(counts);
+                    if(responseAction){
+                        if(!mode)
+                            $(`#user-${username.split(" ").join("-")}`).remove();
+                    }
+                    else{
+
+                        loadClasses(true);
+                    }
+                }
+                else{
+                    alert(res.message);
+                }
+            },
+            fail:function(res){
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout:function(){
+                alert("No connection to server");
+            }
+        });
+
+    }
+    function deleteUser() {
+        if(lastRole==="student"){
+            assignUserToPublicClass(classid, username, false, true);
+        }
+        let x = {
+            username: username
+        };
+        $.ajax({
+            url: "/admin/deleteUser",
+            method: "POST",
+            data: x,
+            success: function (res) {
+                if (!res.message) {
+                    $(`#user-${x.username}`).slideDown(300,function(){
+                        $(`#user-${x.username}`).remove();
+                    });
+                    if(res.data.length>0){
+                        deletingClasses = res.data ;
+                        for(let z = 0 ; z < deletingClasses.length ; z ++){
+                            $(`#class-${deletingClasses[z].id}`).remove();
+                        }
+                        $(".addUser").slideUp(300);
+                        alert("User " + username + "and All Assigned Classes to the user Deleted Successfully ");
+                    }
+                    else {
+                        $(".addUser").slideUp(300);
+                        alert("User " + username + " Deleted Successfully !");
+                    }
+                }
+                else {
+                    alert(res.message);
+                }
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+    }
+
+    function deleteClass() {
+        let x = {
+            id: classid,
+        };
+        $.ajax({
+            url: "/admin/deleteClass",
+            method: "POST",
+            data: x,
+            success: function (res) {
+                if (!res.message) {
+                    $(`#class-${x.id}`).slideDown(300);
+                    setTimeout(function(){
+                        $(`#class-${x.id}`).remove();
+                    },400);
+                    $(".addClass").slideUp(300);
+                    alert("class " + classid + " Deleted Successfully !");
+                }
+                else {
+                    alert(res.message);
+                }
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+    }
+
+
+    function searchUsers(){
+        var x = {
+            text: searchUser,
+        };
+        $.ajax({
+            url: "/admin/searchUsers",
+            method: "POST",
+            data: x,
+            beforeSend:function(){
+                $(".userList").html("");
+            },
+            success: function (res) {
+                if (!res.message) {
+                    if (res.length > 0) {
+                        $.each(res, function (index, data) {
+                            $(".userList").append(`
+                                <li class="eachUser" id="user-${res[index].username.split(" ").join("-")}">
+                                <span>${res[index].username}</span>
+                                <span>${res[index].role}</span>
+                                <button class="rightArrow ${res[index].role}" title="Show User"></button>
+                                <button class="sample" title="Get RFID or Fingerprint Sample"></button>
+                                <button class="editUser" title="Edit User"></button>
+                                <button class="deleteUser" title="Delete User"></button>
+                                </li>
+                            `);
+                        });
+                    }
+                    else{
+                        $(".userList").append(`
+                           <li class="eachUser">
+                                <span>No user found starting with : ${searchUser} </span>
+                            </li>
+                         `);
+                    }
+                }
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+    }
+
+
+    function getClassifiedClasses(){
+        let x = {
+          day:classDay,
+          classId:classNumber
+        };
+        if(classNumber === 0 && classDay === ""){
+            loadClasses();
+        }
+        else {
+            $.ajax({
+                url: "/admin/classifiedClasses/",
+                method: "POST",
+                data: x,
+                beforeSend: function () {
+                    $(".classList").html("");
+                },
+                success: function (res) {
+                    if (!res.message) {
+                        if (res.length > 0) {
+                            $.each(res,function(index,data) {
+                                if(res[index].classId !== 202) {
+                                    let publicz = ``;
+                                    let project = ``;
+                                    let classNumber = "";
+                                    if(res[index].leftDate.minute === 0){
+                                        res[index].leftDate.minute = "00";
+                                    }
+                                    if(res[index].rightDate.minute === 0){
+                                        res[index].rightDate.minute = "00";
+                                    }
+                                    if(res[index].classId === 206){
+                                        classNumber = "206 (206-A)";
+                                    }
+                                    else if(res[index].classId === 226){
+                                        classNumber = "226 (206-B)";
+                                    }
+                                    else{
+                                        classNumber = res[index].classId;
+                                    }
+                                    if((res[index].accessProject !== null) && (res[index].accessProject !== undefined)){
+                                        project = `<button class="projectRoomIcon"></button>`;
+                                    }
+                                    if(res[index].isPublic){
+                                        publicz = `<button class="publicIcon"></button>
+                                       <a class="studentsCounts">${res[index].studentsList.length}</a>
+                                       <button class="editClass" title="Edit Class"></button>
+                                       <button class="assign" title="Assign Class"></button>
+                                       <button class="deleteClass" title="Delete Class"></button>;
+                                    `;
+                                    }
+                                    else{
+                                        publicz = `<button class="editClass" title="Edit Class"></button>
+                                       <button class="deleteClass" title="Delete Class"></button>`;
+                                    }
+                                    $(".classList").append(`
+                                        <li class="eachClass" id="class-${res[index].id}">
+                                            <span>${res[index].name}</span>
+                                            <span> User : ${res[index].ostadUsername} </span>
+                                            <span class="weekDay">Class : ${classNumber}</span>
+                                            <span class="leftTime">${res[index].day} | ${res[index].leftDate.hour}:${res[index].leftDate.minute}  </span>
+                                            <span class="rightTime"> ${res[index].rightDate.hour}:${res[index].rightDate.minute}</span>
+                                            <p hidden>${res[index].id}</p>${project}${publicz}
+                                            <button class="editClass"></button>
+                                            <button class="deleteClass"></button>
+                                        </li>
+                                    `);
+                                }
+                                else{
+                                    $(".classList").append(`
+                                    <li class="eachClass" id="class-${res[index].id}">
+                                        <span>${res[index].name}</span>
+                                        <span class="weekDay"> Class: ${res[index].classId} </span>
+                                        <p hidden>${res[index].id}</p>
+                                        <button class="deleteClass" title="Delete Class"></button>
+                                    </li>`);
+                                }
+                            });
+
+                        }
+                        else{
+                            $(".classList").append(`
+                               <li class="eachClass">
+                                    <span>No class defined !</span>
+                                </li>
+                             `);
+                        }
+                    }
+                },
+                fail: function (res) {
+                    console.log(res);
+                    alert("No connection to server");
+                },
+                timeout: function () {
+                    alert("No connection to server");
+                }
+            });
+        }
+    }
+
+
+
+
+    function showUserHeader(){
+        $("#users .header h3").addClass("show");
+        $("#users .header .searchUserInput").removeClass("show");
+    }
+    function showClassHeader(){
+        $("#classes .header h3").addClass("show");
+        $("#classes .header .classNumber").removeClass("show");
+        $("#classes .header .classDay").removeClass("show");
+    }
+    function showSearch(){
+        $("#users .header h3").removeClass("show");
+        $("#users .header .searchUserInput").addClass("show");
+    }
+    function showClassified(){
+        $("#classes .header h3").removeClass("show");
+        $("#classes .header .classNumber").addClass("show");
+        $("#classes .header .classDay").addClass("show");
+    }
+
+    function alert(message){
+        $("#alertTop h3").html(message);
+        $("#alertTop").addClass("show");
+        setTimeout(function (){
+            $("#alertTop").removeClass("show");
+            // Something you want delayed.
+        }, 5000); // 5seconds show
+    }
+
+    function initialClocks(){
+        var y = "00";
+        for(var x = 0; x < 24;x++){
+            if(x<10){
+                y = "0"+x;
+            }
+            else{
+                y = String(x);
+            }
+            $(".left .hour").append(`
+                <option value="${x}">${y}</option>
+            `);
+            $(".right .hour").append(`
+                <option value="${x}">${y}</option>
+            `);
+        }
+        for(var x = 0; x < 12;x++){
+            if(x<2){
+                y = "0"+x*5;
+            }
+            else{
+                y = String(x*5);
+            }
+            $(".left .minute").append(`
+                <option value="${x*5}">${y}</option>
+            `);
+            $(".right .minute").append(`
+                <option value="${x*5}">${y}</option>
+            `);
+        }
+    }
+
+    function sampleState(element,type){
+        var x = {
+            username: username,
+            type:type
+        };
+        $.ajax({
+            url: "/admin/takeSampleState",
+            method: "POST",
+            data: x,
+            beforeSend:function(){
+                turnButton(element);
+            },
+            success: function (res) {
+                clearInterval(turnInterval);
+                alert(res.message);
+            },
+            fail: function (res) {
+                console.log(res);
+                alert("No connection to server");
+            },
+            timeout: function () {
+                alert("No connection to server");
+            }
+        });
+    }
+    function turnButton(element){
+        turnInterval = setInterval(function(){
+            if(element[0].className.split("turn").length === 1){
+                element.addClass("turn");
+            }
+            else{
+                element.removeClass("turn");
+            }
+        },500);
+    }
+    function logout(){
+        eraseCookie("KEY");
+        eraseCookie("X-ACCESS-TOKEN");
+        window.location.pathname= "/";
+    }
+</script>
+</html>
