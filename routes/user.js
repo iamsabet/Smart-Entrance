@@ -1176,10 +1176,10 @@ var user = {
                                     userSchema.update({
                                         loggedIn: true,
 																				username : clas.ostadUsername
-                                    }, {$set: {command: "O", loggedIn: false,"classId":clas.classId}}, function (err, resx) {
+                                    }, {$set: {command: "O", loggedIn: false,"extraData.class.classId":clas.classId}}, function (err, resx) {
                                         if (err) throw err;
                                         if (resx.n > 0) {
-																					console.log("classId XXXXXXXXXXXXXX");
+
                                             let logObject = {
                                                 date: date.split(" GMT")[0],
                                                 classId: classId || 0,
