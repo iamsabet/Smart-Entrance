@@ -1102,8 +1102,9 @@ h2{
 .clientButtons h2{
   position: absolute;
   left: 50%;
-  bottom: -40px;
+  bottom: -55px;
   font-size: 60px;
+  z-index:100;
   font-weight: bold;
   -webkit-transform: translate(-50%,0);
   -moz-transform: translate(-50%,0);
