@@ -767,21 +767,20 @@ var user = {
                                         fullName: 1,
                                         command: 1
                                     }, function (err, resultz) {
-                                        if (resultz && resultz.extraData) {
-                                            if (resultz.extraData.class2 && resultz.extraData.class2.classId &&  !isNaN(parseInt(resultz.extraData.class2.classId))) {
-
+                                        if (resultz){
+																					if(resultz.extraData){
+	                                            if (resultz.extraData.class2 && resultz.extraData.class2.classId &&  !isNaN(parseInt(resultz.extraData.class2.classId))) {
+																									res.send({
+	                                                    classId: resultz.extraData.class2.classId,
+	                                                    command: resultz.command
+	                                                });
+	                                            }
+																							else{
 																								res.send({
-                                                    classId: resultz.extraData.class2.classId,
-                                                    command: resultz.command
-                                                });
-
-
-                                            }
-																						else{
-																							res.send({
-																									classId: resultz.extraData.class.classId,
-																									command: resultz.command
-																							});
+																										classId: resultz.extraData.class.classId,
+																										command: resultz.command
+																								});
+																							}
 																						}
                                             resultz.save();
                                             userSchema.update({username: userx.username}, {
@@ -1065,7 +1064,7 @@ var user = {
 
                     let date = new Date().toString();
                     if (result.extraData.class.accessProject !== null || result.extraData.class2.accessProject !== null) {
-                        if ((req.body) && (req.body.classId) && (!isNaN(req.body.classId)) && ((result.extraData.class.accessProject === null) || (parseInt(req.body.classId) === result.extraData.class.accessProject) || (parseInt(req.body.classId) === result.extraData.class2.accessProject))) {
+                        if ((req.body) && (req.body.classId) && (!isNaN(req.body.classId)) && ((result.extraData.class.accessProject === null) || (parseInt(req.body.classId) === result.extraData.class.accessProject))) {
 													let classId = result.extraData.class.classId;
 													let id = result.extraData.class.id;
 													let className = result.extraData.class.className;
@@ -1141,11 +1140,11 @@ var user = {
 													let className = result.extraData.class.className;
 													let accessProject = result.extraData.class2.accessProject;
 
-													if(parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
+													if(result.extraData.class2 && result.extraData.class2.classId && parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
 														classId = parseInt(result.extraData.class2.classId);
 														id = result.extraData.class2.id ;
-														className = result.extraData.class2.accessProject;
-
+														className = result.extraData.class2.className;
+														accessProject = result.extraData.class2.accessProject;
 													}
                           classSchema.findOneAndUpdate({
                                 id: id,
