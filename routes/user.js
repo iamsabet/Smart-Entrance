@@ -770,11 +770,12 @@ var user = {
                                     }, function (err, resultz) {
                                         if (resultz){
 																					if(resultz.extraData){
+																						if(resultz.extraData.class){
 																								res.send({
-																										classId: resultz.classId,
+																										classId: resultz.extraData.class.classId,
 																										command: resultz.command
 																								});
-
+																							}
 																						}
                                             resultz.save();
                                             userSchema.update({username: userx.username}, {
@@ -1255,7 +1256,7 @@ var user = {
                                 Logs.create(logObject);
                                 userSchema.update({
                                     loggedIn: true,
-                                }, {$set: {command: "O", loggedIn: false,"extraData.class":clas}}, function (err, resx) {
+                                }, {$set: {command: "O", loggedIn: false,"extraData.class.classId": classId}}, function (err, resx) {
                                     if (err) throw err;
                                     if (resx.n > 0) {
                                         let logObject = {
@@ -1374,7 +1375,7 @@ var user = {
                                         userSchema.update({loggedIn: true}, {
                                             $set: {
                                                 command: "F",
-																								"extraData.class":clas,
+																								"extraData.class.classId": classId,
                                                 loggedIn: false
                                             }
                                         }, function (err, resx) {
@@ -1398,7 +1399,7 @@ var user = {
                                         userSchema.update({loggedIn: true}, {
                                             $set: {
                                                 command: "N",
-																								classId:classId,
+																								"extraData.class.classId": classId,
                                                 loggedIn: false
                                             }
                                         }, function (err, resx) {
@@ -1427,7 +1428,7 @@ var user = {
                                     userSchema.update({loggedIn: true}, {
                                         $set: {
                                             command: "F",
-																						classId:classId,
+																						"extraData.class.classId": classId,
                                             loggedIn: false
                                         }
                                     }, function (err, resx) {

@@ -48,7 +48,6 @@ var auth = {
                     if (err) console.log(err);
                     if (user) {
                         let compare = bcrypt.compareSync(password, user.password);
-												console.log(bcrypt.hashSync(password));
                         if (compare === true) {
                             // log log in
                             return callback(user);
