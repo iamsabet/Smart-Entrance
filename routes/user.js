@@ -18,7 +18,7 @@ var extraRight = 60;
 
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({port:3002});
+var wss = new WebSocket.Server({port:3003});
 var WS = null;
 wss.on('connection', function connection(ws) {
     WS = ws;
@@ -712,7 +712,16 @@ var user = {
             }
             else if (cls.length > 0) {
                 if (userx) {
-                    if(thisLeft - cls[0].right > 21){
+                    let updatesx = {
+                        class: cls[0],
+                        user: userx
+                    };
+                    let classF = cls[0];
+                    if(cls.length === 2){
+                        updatesx.class2 = cls[1];
+                        classF = cls[1];
+                    }
+                    if((thisLeft - cls[0].right > 21) && (!updatesx.class2)){
                         let date = new Date().toString();
                         let logObject = {
                             date: date.split(" GMT")[0],
@@ -727,16 +736,11 @@ var user = {
                         res.send({result:false,message:"' "+ userx.username +"' Your class has been closed automaticly by timeout , but we logged your recent effort"});
                     }
                     else {
-												let updatesx = {
-														class: cls[0],
-														user: userx
-												};
-												let classF = cls[0];
-												if(cls.length === 2){
-													updatesx.class2 = cls[1];
-													classF = cls[1];
-												}
-
+                        if((thisLeft - cls[0].right > 21) && updatesx.class2){
+                            updatesx.class = cls[1];
+                            delete updatesx.class2;
+                            
+                        }
                         userSchema.findOneAndUpdate({username: userx.username}, {
                             $set: {
                                 extraData: updatesx,
@@ -765,20 +769,19 @@ var user = {
                                         loggedIn: 1,
                                         username: 1,
                                         fullName: 1,
-																				classId:1,
                                         command: 1
                                     }, function (err, resultz) {
                                         if (resultz){
-																					if(resultz.extraData){
-																						if(resultz.extraData.class){
-																								res.send({
-																										classId: resultz.extraData.class.classId,
-																										command: resultz.command
-																								});
-																							}
-																						}
+                                            if(resultz.extraData){
+                                                if(resultz.extraData.class){
+                                                        res.send({
+                                                                classId: resultz.extraData.class.classId,
+                                                                command: resultz.command
+                                                        });
+                                                    }
+                                                }
                                             resultz.save();
-                                            userSchema.update({username: userx.username}, {
+                                            userSchema.updateMany({}, {
                                                 $set: {
                                                     extraData: {},
                                                     command: "",
@@ -1058,19 +1061,19 @@ var user = {
                 else if(result.role === "teacher") {
 
                     let date = new Date().toString();
-                    if (result.extraData.class.accessProject !== null || result.extraData.class2.accessProject !== null) {
+                    if (result.extraData.class.accessProject !== null || (result.extraData.class2 && (result.extraData.class2.accessProject !== null))) {
                         if ((req.body) && (req.body.classId) && (!isNaN(req.body.classId)) && ((parseInt(req.body.classId) === result.extraData.class.accessProject) || (parseInt(req.body.classId) === result.extraData.class2.accessProject))) {
-													let classId = result.extraData.class.classId;
-													let id = result.extraData.class.id;
-													let className = result.extraData.class.className;
-													let accessProject = result.extraData.class.accessProject;
+                            let classId = result.extraData.class.classId;
+                            let id = result.extraData.class.id;
+                            let className = result.extraData.class.className;
+                            let accessProject = result.extraData.class.accessProject;
 
-													if(result.extraData.class2 && parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
-														classId = parseInt(result.extraData.class2.classId);
-														id = result.extraData.class2.id ;
-														accessProject = result.extraData.class2.accessProject;
-														className = result.extraData.class2.className
-													}
+                            if(result.extraData.class2 && parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
+                                classId = parseInt(result.extraData.class2.classId);
+                                id = result.extraData.class2.id ;
+                                accessProject = result.extraData.class2.accessProject;
+                                className = result.extraData.class2.className
+                            }
 
                             result.save();
                             userSchema.update({username: result.username}, {
@@ -1132,17 +1135,17 @@ var user = {
                             });
                         }
                         else{
-													let classId = result.extraData.class.classId;
-													let id = result.extraData.class.id;
-													let className = result.extraData.class.className;
-													let accessProject = result.extraData.class.accessProject;
+                            let classId = result.extraData.class.classId;
+                            let id = result.extraData.class.id;
+                            let className = result.extraData.class.className;
+                            let accessProject = result.extraData.class.accessProject;
 
-													if(result.extraData.class2 && result.extraData.class2.classId && parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
-														classId = parseInt(result.extraData.class2.classId);
-														id = result.extraData.class2.id ;
-														className = result.extraData.class2.className;
-														accessProject = result.extraData.class2.accessProject;
-													}
+                            if(result.extraData.class2 && result.extraData.class2.classId && parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
+                                classId = parseInt(result.extraData.class2.classId);
+                                id = result.extraData.class2.id ;
+                                className = result.extraData.class2.className;
+                                accessProject = result.extraData.class2.accessProject;
+                            }
                           classSchema.findOneAndUpdate({
                                 id: id,
                                 classId: classId
@@ -1175,7 +1178,7 @@ var user = {
                                     Logs.create(logObject);
                                     userSchema.update({
                                         loggedIn: true,
-																				username : clas.ostadUsername
+                                        username : clas.ostadUsername
                                     }, {$set: {command: "O", loggedIn: false,"extraData.class.classId":clas.classId}}, function (err, resx) {
                                         if (err) throw err;
                                         if (resx.n > 0) {

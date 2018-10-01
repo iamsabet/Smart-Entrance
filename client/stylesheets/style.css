@@ -699,7 +699,7 @@ h2{
 .eachClass .publicIcon{
   background-image: url("../images/public.png");
   background-color: transparent;
-  background-size: 100% auto;.
+  background-size: 100% auto;
 }
 .eachClass .studentsList{
   position: relative;
@@ -1328,7 +1328,7 @@ h2{
 }
 
 .clientButtons span{
-  font-size:33px;
+  font-size:28px;
   -webkit-transition: all 0.5s ease-in;
   -moz-transition: all 0.5s ease-in;
   -ms-transition: all 0.5s ease-in;
