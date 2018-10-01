@@ -1056,19 +1056,19 @@ var user = {
                 else if(result.role === "teacher") {
 
                     let date = new Date().toString();
-                    console.log((req.body) && (req.body.classId) && (!isNaN(req.body.classId)) && ((result.extraData.class.accessProject === null) || (parseInt(req.body.classId) === result.extraData.class.accessProject)));
-                    if (result.extraData.class.accessProject !== null) {
-                        if ((req.body) && (req.body.classId) && (!isNaN(req.body.classId)) && ((result.extraData.class.accessProject === null) || (parseInt(req.body.classId) === result.extraData.class.accessProject))) {
-
+                    if (result.extraData.class.accessProject !== null || result.extraData.class2.accessProject !== null) {
+                        if ((req.body) && (req.body.classId) && (!isNaN(req.body.classId)) && ((result.extraData.class.accessProject === null) || (parseInt(req.body.classId) === result.extraData.class.accessProject) || (parseInt(req.body.classId) === result.extraData.class2.accessProject))) {
 													let classId = result.extraData.class.classId;
 													let id = result.extraData.class.id;
 													let className = result.extraData.class.className;
+													let accessProject = result.extraData.class.accessProject;
 													if(parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
 														classId = parseInt(result.extraData.class2.classId);
 														id = result.extraData.class2.id ;
+														accessProject = result.extraData.class2.accessProject;
 														className = result.extraData.class2.className
 													}
-													
+
                             result.save();
                             userSchema.update({username: result.username}, {
                                 $set: {
@@ -1085,7 +1085,7 @@ var user = {
                                         if (cls2) {
                                             let logObject = {
                                                 date: date.split(" GMT")[0],
-                                                classId: result.extraData.class.accessProject || 0,
+                                                classId: accessProject || 0,
                                                 username: result.extraData.class.ostadUsername,
                                                 className: "Project Room",
                                                 role: result.role,
@@ -1095,10 +1095,10 @@ var user = {
                                             Logs.create(logObject);
                                             let presentObject = {
                                                 date: date.split(" GMT")[0],
-                                                classId: result.extraData.class.classId || 0,
+                                                classId: classId || 0,
                                                 username: result.username,
-                                                className: cls2.name,
-                                                class_id : result.extraData.class.id
+                                                className: name,
+                                                class_id : id
                                             };
                                             Presents.create(presentObject);
                                             res.send({result: true, command: "On", data: result});
@@ -1131,11 +1131,13 @@ var user = {
 													let classId = result.extraData.class.classId;
 													let id = result.extraData.class.id;
 													let className = result.extraData.class.className;
+													let accessProject = result.extraData.class2.accessProject;
 
 													if(parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
 														classId = parseInt(result.extraData.class2.classId);
 														id = result.extraData.class2.id ;
-														className = result.extraData.class2.className
+														className = result.extraData.class2.accessProject;
+
 													}
                           classSchema.findOneAndUpdate({
                                 id: id,
@@ -1159,9 +1161,9 @@ var user = {
                                     let date = new Date().toString();
                                     let logObject = {
                                         date: date.split(" GMT")[0],
-                                        classId: clas.classId || 0,
+                                        classId: classId || 0,
                                         username: clas.ostadUsername,
-                                        className: clas.name,
+                                        className: className,
                                         role: "teacher",
                                         type: "Command", // Access - Command - Admin
                                         data: "open",
@@ -1208,11 +1210,13 @@ var user = {
 											let classId = result.extraData.class.classId;
 											let id = result.extraData.class.id;
 											let className = result.extraData.class.className;
+											let accessProject = result.extraData.class.accessProject;
 											console.log(parseInt(result.extraData.class2.classId) === parseInt(req.body.classId));
 											if(parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
 												classId = parseInt(result.extraData.class2.classId);
 												id = result.extraData.class2.id ;
-												className = result.extraData.class2.className
+												className = result.extraData.class2.className;
+												accessProject = result.extraData.class2.accessProject;
 											}
                         classSchema.findOneAndUpdate({
                             id: id,
@@ -1236,7 +1240,7 @@ var user = {
                                 let date = new Date().toString();
                                 let logObject = {
                                     date: date.split(" GMT")[0],
-                                    classId: clas.classId || 0,
+                                    classId: classId || 0,
                                     username: clas.ostadUsername,
                                     className: clas.name,
                                     role: "teacher",
@@ -1264,8 +1268,8 @@ var user = {
                                             date: date.split(" GMT")[0],
                                             classId: classId || 0,
                                             username: result.username,
-                                            className: clas.name,
-                                            class_id : className
+                                            className: className,
+                                            class_id : id
                                         };
                                         Presents.create(presentObject);
                                     }
