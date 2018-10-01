@@ -768,22 +768,21 @@ var user = {
                                         command: 1
                                     }, function (err, resultz) {
                                         if (resultz) {
-                                            if(result.extraData.class2 && (parseInt(result.extraData.class2.classId) === parseInt(req.body.classId))){
-																									res.send({
-	                                                    classId: resultz.extraData.class2.classId,
-	                                                    command: resultz.command
-	                                                });
-																								}
-																								else{
-																									res.send({
-	                                                    classId: resultz.extraData.class.classId,
-	                                                    command: resultz.command
-	                                                });
-																								}
+                                            if (req.body.classId && resultz.extraData && resultz.extraData.clas2 && (parseInt(resultz.extraData.clas2.classId) === req.body.classId)) {
+
+																								res.send({
+                                                    classId: resultz.extraData.class2.classId,
+                                                    command: resultz.command
+                                                });
+
+
                                             }
-                                            else {
-                                                res.send({result: false, message: "Oops Something went wrong"});
-                                            }
+																						else{
+																							res.send({
+																									classId: resultz.extraData.class.classId,
+																									command: resultz.command
+																							});
+																						}
                                             resultz.save();
                                             userSchema.update({username: userx.username}, {
                                                 $set: {
