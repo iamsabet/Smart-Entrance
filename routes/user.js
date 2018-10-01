@@ -731,9 +731,12 @@ var user = {
 														class: cls[0],
 														user: userx
 												};
+												let classF = cls[0];
 												if(cls.length === 2){
 													updatesx.class2 = cls[1];
+													classF = cls[1];
 												}
+
                         userSchema.findOneAndUpdate({username: userx.username}, {
                             $set: {
                                 extraData: updatesx,
@@ -745,9 +748,9 @@ var user = {
                                 let date = new Date().toString();
                                 let logObject = {
                                     date: date.split(" GMT")[0],
-                                    classId: cls[0].classId,
+                                    classId: classF.classId,
                                     username: userx.username,
-                                    className: cls[0].name,
+                                    className: classF.className,
                                     role: userx.role,
                                     type: "Access", // Access - Command - Admin
                                     data: "Authorized",
@@ -766,11 +769,18 @@ var user = {
                                     }, function (err, resultz) {
                                         if (resultz) {
                                             if (resultz.extraData && resultz.extraData.class) {
-
-                                                res.send({
-                                                    classId: resultz.extraData.class.classId,
-                                                    command: resultz.command
-                                                });
+                                                if(resultz.extraData.class2){
+																									res.send({
+	                                                    classId: resultz.extraData.class2.classId,
+	                                                    command: resultz.command
+	                                                });
+																								}
+																								else{
+																									res.send({
+	                                                    classId: resultz.extraData.class.classId,
+	                                                    command: resultz.command
+	                                                });
+																								}
                                             }
                                             else {
                                                 res.send({result: false, message: "Oops Something went wrong"});
@@ -787,9 +797,9 @@ var user = {
                                                 if (res.n > 0) {
                                                     logObject = {
                                                         date: date.split(" GMT")[0],
-                                                        classId: cls[0].classId,
+                                                        classId: classF.classId,
                                                         username: userx.username,
-                                                        className: cls[0].name,
+                                                        className: classF.className,
                                                         role: userx.role,
                                                         type: "Access", // Access - Command - Admin
                                                         data: "logged out",
@@ -799,9 +809,9 @@ var user = {
                                                 else {
                                                     logObject = {
                                                         date: date.split(" GMT")[0],
-                                                        classId: cls[0].classId,
+                                                        classId: classF.classId,
                                                         username: resultz.username,
-                                                        className: cls[0].name,
+                                                        className: classF.className,
                                                         role: userx.role,
                                                         type: "Access", // Access - Command - Admin
                                                         data: "log out failed",
@@ -1106,14 +1116,14 @@ var user = {
                                             setTimeout(function () {
                                                 user.adminCommand({
                                                     body: {
-                                                        classId: result.extraData.class.accessProject,
+                                                        classId: accessProject,
                                                         command: "close"
                                                     }
                                                 }, null, lastLoggedInAdmin);
                                                 let date2 = new Date().toString();
                                                 let logObject2 = {
                                                     date: date2.split(" GMT")[0],
-                                                    classId: result.extraData.class.accessProject || 0,
+                                                    classId: accessProject || 0,
                                                     username: result.extraData.class.ostadUsername,
                                                     className: "Project Room",
                                                     role: "admin",
