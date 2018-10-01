@@ -768,7 +768,7 @@ var user = {
                                         command: 1
                                     }, function (err, resultz) {
                                         if (resultz) {
-                                            if (req.body.classId && resultz.extraData && resultz.extraData.clas2 && (parseInt(resultz.extraData.clas2.classId) === req.body.classId)) {
+                                            if (req.body.classId && resultz.extraData && resultz.extraData.clas2 && !isNaN((parseInt(resultz.extraData.clas2.classId))) {
 
 																								res.send({
                                                     classId: resultz.extraData.class2.classId,
