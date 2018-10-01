@@ -1097,7 +1097,7 @@ var user = {
                                                 date: date.split(" GMT")[0],
                                                 classId: classId || 0,
                                                 username: result.username,
-                                                className: name,
+                                                className: className,
                                                 class_id : id
                                             };
                                             Presents.create(presentObject);
