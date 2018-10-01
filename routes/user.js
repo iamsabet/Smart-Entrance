@@ -1075,7 +1075,7 @@ var user = {
                             result.save();
                             userSchema.update({username: result.username}, {
                                 $set: {
-                                    "extraData.class.classId": classId,
+                                    "extraData.class.classId": accessProject,
                                     command: "O",
                                     loggedIn: false
                                 }
