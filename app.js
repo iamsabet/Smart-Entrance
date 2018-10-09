@@ -9,7 +9,6 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var requestIp = require("request-ip");
 var routes = require('./routes/index');
-var classes = require('./routes/class');
 var db = mongoose.connection;
 var favicon = require("serve-favicon");
 var CronJob = require('cron').CronJob;
@@ -21,22 +20,11 @@ db.openUri("mongodb://localhost:27017/se_db",function() {
     console.log("Server Listening : "+port);
     console.log("connected to se_db");
 });
-new CronJob('1 * * * * *', function() {
-    classes.timeOutCloseCheck();
-}, null, true);
-new CronJob('30 20 * * *', function() {
-    console.log("Reset Done ===============");
-    classes.clearDayClasses();
-}, null, true);
 
-new CronJob('1 22 * * *', function() {
-    console.log("Reset Night ===============");
-    classes.clearDayClasses();
-}, null, true);
 
 new CronJob('31 21 * * *', function() {
     console.log("Reset Befor Night ===============");
-    classes.clearDayClasses();
+    // admin close command
 }, null, true);
 
 // routes ======================================================================

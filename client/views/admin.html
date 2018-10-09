@@ -26,10 +26,7 @@
         <div class="addUser">
             <h3>Add User</h3>
             <input type="text" placeholder="username" class="username">
-            <select class="role">
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
-            </select>
+            <input type="number" placeholder="example : 92213018" class="userId">
             <button class="submitUser">Submit</button>
         </div>
         <div class="listContainer">
@@ -46,72 +43,6 @@
         </div>
     </div>
 <!--rast -->
-    <div class="container show" id="classes">
-        <div class="addClass">
-            <h3>Add Class</h3>
-            <input type="text" placeholder="name" class="className">
-            <input type="number" placeholder="class id" class="classId"><br>
-            <div class="dayy">
-            <span>Day</span>
-            <select class="day">
-                <option value="Sat">Saturday</option>
-                <option value="Sun">Sunday</option>
-                <option value="Mon">Monday</option>
-                <option value="Tue">Tuesday</option>
-                <option value="Wed">Wednesday</option>
-                <option value="Thu">Thursday</option>
-                <option value="Fri">Friday</option>
-                <option value="All">All</option>
-            </select>
-            </div>
-            <div class="left">
-                <span>Start Time</span>
-                <select class="minute">
-
-                </select>
-                <select class="hour">
-
-                </select>
-            </div>
-            <div class="right">
-                <span>End Time</span>
-                <select class="minute">
-
-                </select>
-                <select class="hour">
-
-                </select>
-            </div>
-            <p>Access Project Room <input type="checkbox" class="accessProject" name="accessProject" />
-            </p>
-            <p>Public Class <input type="checkbox" class="isPublic" name="isPublic" />
-            </p>
-            <button class="submitClass">Submit</button>
-        </div>
-        <div class="listContainer">
-            <div class="header">
-                <h3>Classes</h3>
-                <input type="number" class="classNumber">
-                <select class="classDay">
-                    <option value="">All</option>
-                    <option value="Sat">Sat</option>
-                    <option value="Sun">Sun</option>
-                    <option value="Mon">Mon</option>
-                    <option value="Tue">Tue</option>
-                    <option value="Wed">Wed</option>
-                    <option value="Thu">Thu</option>
-                    <option value="Fri">Fri</option>
-                </select>
-                <button class="newClass" title="Add New Class"></button>
-                <button class="reload" title="Reload">
-                <button class="classified" title="Classified classes"></button>
-                </button>
-            </div>
-            <ul class="classList">
-
-            </ul>
-        </div>
-    </div>
     <div class="container clientMonitor" id="monitor">
         <h2>Classes</h2>
         <ul class="classList">
@@ -227,15 +158,6 @@
         submitUser();
         studentsView = false;
     });
-    $("body").on("click",".submitClass",function(){
-        if(username !== "") {
-            submitClass();
-        }
-        else {
-            alert("Choose a user first");
-        }
-        studentsView = false;
-    });
     $("body").on("click","#logout",function(){
         logout();
         window.location.pathname = "/";
@@ -252,30 +174,8 @@
         $(".addUser h3").html("Edit User : " + lastUserName);
         studentsView = false;
     });
-    $("body").on("click",".eachUser .rightArrow.teacher",function(){ // do on roles 
-        $(".addUser").slideUp(300);
-        if($(".newClass.close"))
-            $(".newClass.close").click();
-        username  = $(this).siblings("span").html();
-        lastUserName = username;
-        lastRole = $(this).siblings("span")[1].innerHTML;
-        loadClasses();
-        $("#classes .header h3").html(" "+username + "\n Assigned Classes ");
-        $(".laodHome").show(300);
-        studentsView = false;
-    });
-    $("body").on("click",".eachUser .rightArrow.student",function(){ // find public class includes studentsList {$in:[]}
-        $(".addUser").slideUp(300);
-        if($(".newClass.close"))
-            $(".newClass.close").click();
-        username  = $(this).siblings("span").html();
-        lastRole = $(this).siblings("span")[1].innerHTML;
-        lastUserName = username;
-        loadClasses(true);
-        $("#classes .header h3").html(" "+username + "\n Assigned Classes ");
-        $(".laodHome").show(300);
-        studentsView = false;
-    });
+    
+    
     $("body").on("click",".loadHome",function(){
         $(".addUser").slideUp(300);
         $(".addClass").slideUp(300);
@@ -286,33 +186,17 @@
         $(".loadHome").hide(300);
         studentsView = false;
     });
-    $("body").on("click",".eachClass .studentsCounts",function() {
-        classid  = $(this).siblings("p").html();
-        lastUserName = $(this).siblings("span")[1].innerHTML.split(": ")[1].split(" ")[0];
-        let className = $(this).siblings("span")[0].innerHTML;
-        username = lastUserName;
-        getClassInfos(true,className);
-        studentsView = true;
+        $("body").on("click","#users .header .newUser",function(){
+        $(".addUser").slideDown(300);
+        $(this).addClass("close");
+        submitMode = "create";
+        $(".addUser h3").html("Add User");
+        $(".addUser .username").val("");
+    });
 
-    });
-    $("body").on("click",".eachClass .assign",function(){
-        classid  = $(this).siblings("p").html();
-        assignUserToPublicClass(classid,username,true);
-    });
-    $("body").on("click",".eachClass .remove",function(){
-        classid  = $(this).siblings("p").html();
-        assignUserToPublicClass(classid,username,false);
-    });
-    $("body").on("click",".eachClass .editClass",function(){
-        classid  = $(this).siblings("p").html();
-        lastUserName = $(this).siblings("span")[1].innerHTML.split(": ")[1].split(" ")[0];
-        username = lastUserName;
-        $(".addClass").slideDown(300);
-        getClassInfos();
-        submitMode = "edit";
-        var element = $(".newClass");
-        element.addClass("close");
-        $(".addClass h3").html("Edit Class");
+    $("body").on("click","#users .header .newUser.close",function(){
+        $(".addUser").slideUp(300);
+        $(this).removeClass("close");
     });
 
     $("body").on("click","#users .header .newUser",function(){
@@ -328,32 +212,32 @@
         $(this).removeClass("close");
     });
 
-    $("body").on("click","#classes .header .newClass",function(){
-        if(lastRole === "student"){
-            loadClasses(false)
-        }
-        else {
-            $(".addClass").slideDown(300);
-            $(this).addClass("close");
-            submitMode = "create";
-            $(".addClass h3").html("Add Class");
-            $(".addClass .classNumber").val("");
-            $(".addClass .classDay").val("");
-            $(".addClass .className").val("");
-        }
+    $("body").on("click","#users .header .newUser",function(){
+        $(".addUser").slideDown(300);
+        $(this).addClass("close");
+        submitMode = "create";
+        $(".addUser h3").html("Add User");
+        $(".addUser .username").val("");
     });
 
-    $("body").on("click","#classes .header .newClass.close",function(){
-        $(".addClass").slideUp(300);
+    $("body").on("click","#users .header .newUser.close",function(){
+        $(".addUser").slideUp(300);
         $(this).removeClass("close");
     });
 
-
-
-
-    $("body").on("click",".addClass .cancel",function(){
-        $("#classes .close").click();
+    $("body").on("click","#users .header .newUser",function(){
+        $(".addUser").slideDown(300);
+        $(this).addClass("close");
+        submitMode = "create";
+        $(".addUser h3").html("Add User");
+        $(".addUser .username").val("");
     });
+
+    $("body").on("click","#users .header .newUser.close",function(){
+        $(".addUser").slideUp(300);
+        $(this).removeClass("close");
+    });
+
     $("body").on("click",".addUser .cancel",function(){
         $("#users close").click();
     });
@@ -380,30 +264,6 @@
         }
         studentsView = false;
 
-    });
-
-    $("body").on("click",".deleteClass",function(){
-        classid  = $(this).siblings("p")[0].innerHTML;
-        $("#box h3").html(`
-           Are you sure you want to delete class ${classid} ?
-        `);
-        $("#box").show(300);
-        $("#box").removeClass("user");
-        $("#box").addClass("class");
-        studentsView = false;
-    });
-
-    $("body").on("click","#classes .reload",function(){
-        loadClasses();
-        if(this.className === "reload"){
-            $(this).addClass("turn");
-        }
-        else if(this.className === "reload turn"){
-            $(this).removeClass("turn");
-        }
-        else{
-            console.log("Did not turn");
-        }
     });
 
     $("body").on("click","#users .reload",function(){
@@ -443,10 +303,6 @@
     $("body").on("click","#users .sample.rfid",function(){
         username = $(this).siblings("span").html();
         sampleState($(this),"rfid");
-    });
-    $("body").on("click","#users .sample.finger",function(){
-        username = $(this).siblings("span").html();
-        sampleState($(this),"finger");
     });
     $("body").on("click",".classified",function(){
         showClassified();
@@ -643,7 +499,7 @@
         if (submitMode === "create") {
             var x = {
                 username: $(".username").val(),
-                role :$(".role").val()
+                userId :$(".userId").val()
             };
             $.ajax(
                 {
@@ -661,10 +517,9 @@
                             $(".userList").append(`
                                 <li class="eachUser" id="user-${x.username.split(" ").join("-")}">
                                     <span>${x.username}</span>
-                                    <span>${x.role}</span>
-                                    <button class="rightArrow ${x.role}" title="Show User"></button>
+                                    <span>${x.userId}</span>
+                                    <button class="rightArrow ${x.userId}" title="Show User"></button>
                                     <button class="sample rfid" title="Get RFID Sample"></button>
-                                    <button class="sample finger" title="Get Fingerprint Sample"></button>
                                     <button class="editUser" title="Edit User"></button>
                                     <button class="deleteUser" title="Delete User"></button>
                                 </li>
@@ -690,7 +545,7 @@
             let x = {
                 newUsername:$(".username").val(),
                 username: lastUserName,
-                role :$(".role").val()
+                userId :$(".userId").val()
             };
             $.ajax(
                 {
@@ -706,10 +561,8 @@
                             $(".userList").prepend(`
                                 <li class="eachUser" id="user-${x.username.split(" ").join("-")}">
                                     <span>${x.username}</span>
-                                    <span>${x.role}</span>
-                                    <button class="rightArrow ${x.role}" title="Show User"></button>
+                                    <span>${x.userId}</span>
                                     <button class="sample rfid" title="Get RFID Sample"></button>
-                                    <button class="sample finger" title="Get Fingerprint Sample"></button>
                                     <button class="editUser" title="Edit User"></button>
                                     <button class="deleteUser" title="Delete User"></button>
                                 </li>
@@ -785,12 +638,10 @@
                     $(".userList").append(`
                                 <li class="eachUser" id="user-${list[index].username.split(" ").join("-")}">
                                 <span>${list[index].username}</span>
-                                <span>${list[index].role}</span>
-                                <button class="rightArrow ${list[index].role}" title="Show User"></button>
+                                <span>${list[index].userId}</span>
                                 <button class="sample rfid" title="Get RFID Sample"></button>
-                                <button class="sample finger" title="Get Fingerprint Sample"></button>
                                 <button class="editUser" title="Edit User"></button>
-                                <button class="deleteUser ${list[index].role}" title="Delete User"></button>
+                                <button class="deleteUser ${list[index].userId}" title="Delete User"></button>
                                 </li>
                             `);
                 });

@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var users = require('./user');
-var classes = require('./class');
 var validateRequest = require("../middleWares/validateRequest");
 var auth = require('./auth');
 
@@ -59,15 +58,9 @@ router.get('/login', function(req,res){
     });
 });
 
-router.get('/client', function(req, res) {
-    res.render('client.html');
+router.post('/client/takeSample', function(req, res) {
+    users.takeSample(req,res);
 });
-
-
-router.get('/client/getUsers', function(req, res) {
-    users.getAll(req,res);
-});
-
 
 router.get('/admin/getUserInfo/:uuid', function(req, res) {
     validateRequest(req,res,function(callback) {
@@ -80,75 +73,7 @@ router.get('/admin/getUserInfo/:uuid', function(req, res) {
     });
 });
 
-router.get('/admin/getClasses/', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            classes.getAll(req,res,"");
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
-});
 
-router.get('/admin/getClasses/:uuid', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            classes.getAll(req,res,req.params.uuid);
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
-});
-
-router.get('/admin/getPublicClasses/', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            classes.getAll(req,res,"",true);
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
-});
-
-router.get('/admin/getPublicClasses/:uuid', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            classes.getAll(req,res,req.params.uuid,true);
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
-});
-
-router.get('/admin/getClassInfo/:uuid', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            classes.getInfo(req,res,req.params.uuid);
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
-});
-router.get('/client/getNumberClasses', function(req, res) {
-
-    classes.getAll(req,res,"Number");
-
-});
-router.get('/admin/getNumberClasses', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            classes.getAll(req,res,"Number");
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
-});
 router.post('/admin/getLogs', function(req, res) {
     validateRequest(req,res,function(callback) {
         if(callback) {
@@ -159,21 +84,6 @@ router.post('/admin/getLogs', function(req, res) {
         }
     });
 });
-
-router.post('/admin/getPresents', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            users.getPresents(req,res);
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
-});
-
-
-
-
 
 router.post('/admin/login', auth.login);
 router.post('/admin/addUser', function(req, res) {
@@ -186,31 +96,12 @@ router.post('/admin/addUser', function(req, res) {
         }
     });
 });
-router.post('/admin/addClass', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            classes.register(req,res);
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
-});
+
 
 router.post('/admin/editUser', function(req, res) {
     validateRequest(req,res,function(callback) {
         if(callback) {
             users.edit(req,res);
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
-});
-router.post('/admin/editClass', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            classes.edit(req,res);
         }
         else{
             res.send({result:false,message:"Oops"});
@@ -228,30 +119,10 @@ router.post('/admin/deleteUser', function(req, res) {
         }
     });
 });
-router.post('/admin/deleteClass', function(req, res) {
+router.post('/admin/takeSampleState', function(req, res) {
     validateRequest(req,res,function(callback) {
         if(callback) {
-            classes.delete(req,res,req.body.id);
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
-});
-router.post('/admin/assignStudent', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            classes.assignStudentToPublicClass(req,res);
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
-});
-router.post('/admin/removeStudent', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            classes.removeStudentFromPublicClass(req,res);
+            users.SampleState(req,res);
         }
         else{
             res.send({result:false,message:"Oops"});
@@ -268,9 +139,6 @@ router.post('/admin/takeSampleState', function(req, res) {
         }
     });
 });
-router.post('/client/takeSampleState', function(req, res) {
-    users.SampleState(req,res);
-});
 router.post('/admin/searchUsers', function(req, res) {
     validateRequest(req,res,function(callback) {
         if(callback) {
@@ -278,27 +146,6 @@ router.post('/admin/searchUsers', function(req, res) {
         }
         else{
             res.send({result:false,message:"Oops"});
-        }
-    });
-});
-router.post('/admin/classifiedClasses', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            classes.search(req,res);
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
-});
-
-router.post('/client/adminCommand', function(req, res) {
-    users.getAdmin(function(callback) {
-        if(callback) {
-            users.adminCommand(req, res, callback);
-        }
-        else{
-            res.send({result:false,message:"No Admin found"});
         }
     });
 });
@@ -313,44 +160,6 @@ router.post('/admin/adminCommand', function(req, res) {
         }
     });
 });
-
-
-
-
-
-
-router.get('/client/checkAdminCommand', function(req, res) {
-
-    users.checkAdminCommand(req, res);
-
-});
-router.get('/client/checkAdminCommand', function(req, res) {
-    users.checkAdminCommand(req, res);
-});
-router.get('/client/getNowClasses', function(req, res) {
-    classes.getNowClasses(req,res);
-});
-router.post('/client/takeSample', function(req, res) {
-    users.takeSample(req,res);
-});
-router.post('/client/checkAuth', function(req, res) {
-    users.checkAuth(req,res);
-});
-router.post('/client/logout', function(req, res) {
-    users.logout(req,res);
-});
-router.post('/client/onCommand', function(req, res) {
-    users.on(req,res);
-});
-router.post('/client/offCommand', function(req, res) {
-    users.off(req,res);
-});
-
-
-
-
-
-
 
 router.post('/superuser/registerAdmin', function(req, res) {
     validateRequest(req,res,function(callback) {

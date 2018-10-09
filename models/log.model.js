@@ -9,6 +9,7 @@ var logSchema = new Schema({
     username: String,
     className: String,
     role : String,
+    userId : String,
     type : String, // Access - Command - Admin
     data : String//  Authorized - Not Authorized - Authenticated But not Authorized //  "Open" , "Close" , "timeout" // create // edit // remove //
 });

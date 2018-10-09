@@ -26,7 +26,6 @@ userSchema.methods.create = function (req,res,userObject) {
 
     var newUser = new Users(userObject);
     newUser.createdAt = Date.now();
-    newUser.userId = random.generate();
     newUser.save(function(err){
         if(err){
 
