@@ -183,7 +183,7 @@ router.get('/superuser/getAdmins', function(req, res) {
 });
 router.get('/admin/getUsers', function(req, res) {
     validateRequest(req,res,function(callback) {
-        if(callback && (callback.role === "admin" || callback.role === "superUser")){
+        if(callback && (callback.role === "admin" || callback.role === "superuser")){
             users.getAll(req, res);
         }
         else{
