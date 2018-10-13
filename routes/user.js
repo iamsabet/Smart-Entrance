@@ -738,8 +738,7 @@ var user = {
                     else {
                         if((thisLeft - cls[0].right > 21) && updatesx.class2){
                             updatesx.class = cls[1];
-                            delete updatesx.class2;
-                            
+                            delete updatesx.class2;                            
                         }
                         userSchema.findOneAndUpdate({username: userx.username}, {
                             $set: {
@@ -1062,7 +1061,7 @@ var user = {
 
                     let date = new Date().toString();
                     if (result.extraData.class.accessProject !== null || (result.extraData.class2 && (result.extraData.class2.accessProject !== null))) {
-                        if ((req.body) && (req.body.classId) && (!isNaN(req.body.classId)) && ((parseInt(req.body.classId) === result.extraData.class.accessProject) || (parseInt(req.body.classId) === result.extraData.class2.accessProject))) {
+                        if ((req.body) && (req.body.classId) && (!isNaN(req.body.classId))&& (result.extraData.class) && ((parseInt(req.body.classId) === result.extraData.class.accessProject) || ((result.extraData.class2)&& (parseInt(req.body.classId) === result.extraData.class2.accessProject)))) {
                             let classId = result.extraData.class.classId;
                             let id = result.extraData.class.id;
                             let className = result.extraData.class.className;
