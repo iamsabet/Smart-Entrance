@@ -537,7 +537,7 @@ var user = {
            }
         });
     },
-    adminCommand:function(req,res,usr){
+    adminCommand:function(req,res,usr1){
         if(!usr){
             usr = lastLoggedInAdmin;
         }
