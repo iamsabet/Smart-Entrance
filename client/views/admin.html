@@ -90,7 +90,6 @@
 
     $(document).ready(function(){
         loadUsers();
-        showUserHeader();
     });
     $("body").on("click","#printLogs",function(){
         $.ajax({
@@ -156,7 +155,7 @@
         $(".addUser").slideDown(300);
         username  = $(this).siblings("span").html();
         lastUserName = username;
-        $(".role").val($(this).siblings("span")[1].innerHTML);
+        $(".addUser .userId").val($(this).siblings("span")[1].innerHTML);
         getUserInfos();
         submitMode = "edit";
         let element = $(".newUser");
