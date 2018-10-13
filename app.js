@@ -16,9 +16,9 @@ var CronJob = require('cron').CronJob;
 
 mongoose.connect('mongodb://localhost:27017/se_db_single');
 db.on('error', console.error.bind(console, 'connection error:'));
-db.openUri("mongodb://localhost:27017/se_db",function() {
+db.openUri("mongodb://localhost:27017/se_db_single",function() {
     console.log("Server Listening : "+port);
-    console.log("connected to se_db");
+    console.log("connected to se_db_single");
 });
 
 
