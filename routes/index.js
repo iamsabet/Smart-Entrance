@@ -181,5 +181,15 @@ router.get('/superuser/getAdmins', function(req, res) {
         }
     });
 });
+router.get('/admin/getUsers', function(req, res) {
+    validateRequest(req,res,function(callback) {
+        if(callback && (callback.role === "admin" || callback.role === "superUser")){
+            users.getAll(req, res);
+        }
+        else{
+            res.send({result:false,message:"403 Forbidden"})
+        }
+    });
+});
 
 module.exports = router;
