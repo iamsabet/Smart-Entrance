@@ -122,7 +122,7 @@ router.post('/admin/deleteUser', function(req, res) {
 router.post('/admin/takeSampleState', function(req, res) {
     validateRequest(req,res,function(callback) {
         if(callback) {
-            users.SampleState(req,res);
+            users.SampleState(req,res,callback);
         }
         else{
             res.send({result:false,message:"Oops"});

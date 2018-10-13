@@ -276,7 +276,7 @@ var user = {
         });
 
     },
-    SampleState : function(req, res) {
+    SampleState : function(req, res,userxm) {
 
         if(req.body.username) {
             userSchema.findOneAndUpdate({username:req.body.username},{
@@ -307,6 +307,7 @@ var user = {
                             timeoutTime = 11000;
                             // commands to get finger print
                         }
+                        user.adminCommand(req,res,userxm);
                         setTimeout(function () {
                             if(req.body.type === "finger"){
                                 // commands to clean finger print state to listening
@@ -558,29 +559,19 @@ var user = {
            }
         });
     },
-    adminCommand:function(req,res,usr1){
+    adminCommand:function(req,res,usr){
         if(!usr){
             usr = lastLoggedInAdmin;
         }
         if(WS!==null) {
-            if (usr.role === "admin" || usr.role === "superuser")
-                
+            if (usr.role === "admin" || usr.role === "superuser"){
                 WS.send({type:"A"}, function (ack) {
                     console.log(" ACK :::::: "  + ack);
-                    let date = new Date().toString();
-                    let logObject = {
-                        date: date.split(" GMT")[0],
-                        classId: classId || 0,
-                        username: sys || usr.username,
-                        className: "null",
-                        role: "Admin",
-                        type: "Command", // Access - Command - Admin
-                        data: tempCommand,
-                    };
+                    
                 });
             }
         }
-        
+    }     
 };
 
 module.exports = user;
