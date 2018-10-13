@@ -430,13 +430,13 @@ var user = {
                                         role: "null",
                                         type: "Access", // Access - Command - Admin
                                         data: "Not Authenticated / RFID : "+rfId,
+                                    }
                                         authenticated = "Invalid RFID";
                                         Logs.create(logObject);
                                         res.send({
                                             result: false,
-                                        };
-                                        message: "Access Denied",
-                                        type : "D"
+                                            message: "Access Denied",
+                                            type : "D"
                                     });
                                 }
                             });
