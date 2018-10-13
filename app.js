@@ -14,7 +14,7 @@ var favicon = require("serve-favicon");
 var CronJob = require('cron').CronJob;
 
 
-mongoose.connect('mongodb://localhost:27017/se_db');
+mongoose.connect('mongodb://localhost:27017/se_db_single');
 db.on('error', console.error.bind(console, 'connection error:'));
 db.openUri("mongodb://localhost:27017/se_db",function() {
     console.log("Server Listening : "+port);
@@ -22,10 +22,6 @@ db.openUri("mongodb://localhost:27017/se_db",function() {
 });
 
 
-new CronJob('31 21 * * *', function() {
-    console.log("Reset Befor Night ===============");
-    // admin close command
-}, null, true);
 
 // routes ======================================================================
 

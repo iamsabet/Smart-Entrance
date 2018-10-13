@@ -536,7 +536,30 @@ var user = {
                res.send({result:false,message:"No logs found"});
            }
         });
-    }
+    },
+    adminCommand:function(req,res,usr){
+        if(!usr){
+            usr = lastLoggedInAdmin;
+        }
+        if(WS!==null) {
+            if (usr.role === "admin" || usr.role === "superuser")
+                
+                WS.send({type:"A"}, function (ack) {
+                    console.log(" ACK :::::: "  + ack);
+                    let date = new Date().toString();
+                    let logObject = {
+                        date: date.split(" GMT")[0],
+                        classId: classId || 0,
+                        username: sys || usr.username,
+                        className: "null",
+                        role: "Admin",
+                        type: "Command", // Access - Command - Admin
+                        data: tempCommand,
+                    };
+                });
+            }
+        }
+        
 };
 
 module.exports = user;
