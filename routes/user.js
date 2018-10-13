@@ -565,7 +565,7 @@ var user = {
         }
         if(WS!==null) {
             if (usr.role === "admin" || usr.role === "superuser"){
-                WS.send({type:"A"}, function (ack) {
+                WS.send("A", function (ack) {
                     console.log(" ACK :::::: "  + ack);
                     
                 });
