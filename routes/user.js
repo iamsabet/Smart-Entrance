@@ -13,7 +13,7 @@ var extraRight = 60;
 
 const WebSocket = require('ws');
 
-var wss = new WebSocket.Server({port:3003});
+var wss = new WebSocket.Server({port:3006});
 var WS = null;
 wss.on('connection', function connection(ws) {
     WS = ws;
