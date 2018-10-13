@@ -191,7 +191,8 @@ var user = {
     },
     edit: function(req, res) {
         if(req.body.userId && req.body.userId.length < 14){
-            userSchema.findOne({$or:[{username:req.body.newUsername},{userId:req.body.userId}]},function(err,user){
+            
+            userSchema.findOne({username:req.body.newUsername},function(err,usx){
                 if(err) {
                     var date1 = new Date().toString();
                     var logObject1 = {
@@ -206,20 +207,40 @@ var user = {
                     Logs.create(logObject1);
                     res.send({result:false,message:"Oops Something Went Wrong"});
                 }
-                if(!user || req.body.username === req.body.newUsername) {
-                    userSchema.update({username: req.body.username},
-                        {
-                            $set: {
-                                username: req.body.newUsername,
-                                userId: req.body.userId,
-                                role: req.body.role
-                            }
-                        }, function (err, result) {
-                            if (err) {
-                                res.send({result: false, message: "Oops Something went wrong - please try again"});
-                            }
-                            res.send(true);
-                        });
+                if(!usx || (usx.username === req.body.username)){
+                    userSchema.findOne({userId:req.body.newUserId},function(err2,usrx){
+                        if(err2){
+                            var date1 = new Date().toString();
+                            var logObject1 = {
+                                date: date1.split(" GMT")[0],
+                                classId: 0,
+                                username: "admin",
+                                className: "err2",
+                                role: "admin",
+                                type: "Error", // Access - Command - Admin
+                                data: "edit user",
+                            };
+                            Logs.create(logObject1);
+                            res.send({result:false,message:"Oops Something Went Wrong"});
+                        }
+                        if(!usrx || (usrx.username === req.body.username)){ 
+                            userSchema.update({username: req.body.username},
+                            {
+                                $set: {
+                                    username: req.body.newUsername,
+                                    userId: req.body.newUserId
+                                }
+                            }, function (err, result) {
+                                if (err) {
+                                    res.send({result: false, message: "Oops Something went wrong - please try again"});
+                                }
+                                res.send(true);
+                            });
+                        }
+                        else{
+                            res.send({result:false,message:"userId "+req.body.newUserId + " already token !" });
+                        }
+                    });
                 }
                 else{
                     res.send({result:false,message:"username "+req.body.newUsername + " already token !" });
