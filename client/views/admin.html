@@ -90,9 +90,7 @@
 
     $(document).ready(function(){
         loadUsers();
-        initialClocks();
         showUserHeader();
-
     });
     $("body").on("click","#printLogs",function(){
         $.ajax({
@@ -353,7 +351,6 @@
                                 </li>
                             `);
                             $("#users .close").click();
-                            $(".addUser").slideUp(300);
                         }
                         else {
                             alert(res.message);
