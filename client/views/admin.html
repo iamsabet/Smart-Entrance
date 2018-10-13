@@ -188,45 +188,6 @@
         $(this).removeClass("close");
     });
 
-    $("body").on("click","#users .header .newUser",function(){
-        $(".addUser").slideDown(300);
-        $(this).addClass("close");
-        submitMode = "create";
-        $(".addUser h3").html("Add User");
-        $(".addUser .username").val("");
-    });
-
-    $("body").on("click","#users .header .newUser.close",function(){
-        $(".addUser").slideUp(300);
-        $(this).removeClass("close");
-    });
-
-    $("body").on("click","#users .header .newUser",function(){
-        $(".addUser").slideDown(300);
-        $(this).addClass("close");
-        submitMode = "create";
-        $(".addUser h3").html("Add User");
-        $(".addUser .username").val("");
-    });
-
-    $("body").on("click","#users .header .newUser.close",function(){
-        $(".addUser").slideUp(300);
-        $(this).removeClass("close");
-    });
-
-    $("body").on("click","#users .header .newUser",function(){
-        $(".addUser").slideDown(300);
-        $(this).addClass("close");
-        submitMode = "create";
-        $(".addUser h3").html("Add User");
-        $(".addUser .username").val("");
-    });
-
-    $("body").on("click","#users .header .newUser.close",function(){
-        $(".addUser").slideUp(300);
-        $(this).removeClass("close");
-    });
-
     $("body").on("click",".addUser .cancel",function(){
         $("#users close").click();
     });
@@ -408,6 +369,15 @@
             );
         }
     }
+    function alert(message){
+        $("#alertTop h3").html(message);
+        $("#alertTop").addClass("show");
+        setTimeout(function (){
+            $("#alertTop").removeClass("show");
+            // Something you want delayed.
+        }, 5000); // 5seconds show
+    }
+
     function loadUsers(list) {
 
         if(!list) {
