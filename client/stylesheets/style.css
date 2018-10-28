@@ -974,7 +974,7 @@ h2{
   position: relative;
   display: inline-block;
   width:90%;
-  height: 105px;
+  height: 69px;
   background-color: #dddddd;
   margin: 5px;
   padding: 8px;
@@ -1056,7 +1056,7 @@ h2{
 .clientButtons {
   position: absolute;
   bottom: 0;
-  height: 24vh;
+  height: 15vh;
   width: 100vw;
   background-color: #3c6e45;
   padding: 10px 0;
@@ -1329,7 +1329,7 @@ h2{
 }
 
 .clientButtons span{
-  font-size:28px;
+  font-size:25px;
   -webkit-transition: all 0.5s ease-in;
   -moz-transition: all 0.5s ease-in;
   -ms-transition: all 0.5s ease-in;
@@ -1367,6 +1367,7 @@ h2{
   left: 50%;
   width: 95%;
   height: 66%;
+  z-index: 100000000;
 }
 #admin h2,#admin h1{
   color:black;
@@ -1426,24 +1427,25 @@ h2{
   list-style-type: none;
 }
 #admin ul.show{
-  height: 75.5%;
-  min-height: 300px;
+  height: auto;
+  min-height: 100px;
   overflow-y: auto;
 }
 #admin ul li{
   position: relative;
   display: inline-block;
   width: 100%;
-  padding:15px 0;
-  margin-top:10px;
+  padding:0;
+  margin-top:5px;
   background-color: #ccc;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   border-radius: 10px;
+  height: 60px !important;
 }
 #admin ul li span{
-  margin:10px 10px;
-  font-size:26px;
+  margin: 5px 10px;
+  font-size: 18px;
 }
 #admin .classes{
   margin:0;
@@ -1458,9 +1460,9 @@ h2{
 
 }
 #admin .usrList .eachUser button{
-  width: 52px;
-  height: 52px;
-  margin: 10px;
+  width: 45px;
+  height: 45px;
+  margin: 0px 10px;
   background-position: center center;
   background-size: auto 95%;
   background-color: #222;

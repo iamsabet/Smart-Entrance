@@ -4,21 +4,20 @@ var logSchema = require('../models/log.model');
 var Logs = new logSchema();
 var bcrypt = require("bcrypt-nodejs");
 var lastLoggedInAdmin={};
+const WebSocket = require('ws');
 var json2csv = require('json2csv');
 var fs = require('fs');
 var authenticated = null;
-
 var extraLeft = 20;
 var extraRight = 60;
 
-const WebSocket = require('ws');
 
 var wss = new WebSocket.Server({port:3004});
 var WS = null;
 wss.on('connection', function connection(ws) {
     WS = ws;
     ws.on('message', function incoming(message) {
-        console.log('received: %s', message);
+        console.log(message);
     });
 });
 /* GET home page. */
@@ -34,10 +33,10 @@ var user = {
       });
     },
     getAll: function(req, res) {
-        userSchema.find({role:{$nin:["admin","superuser"]}},{username:1,fullName:1,createdAt:1,userId:1,role:1},function(err,users) {
+        userSchema.find({role:{$nin:["admin","superuser"]}},{username:1,fullName:1,createdAt:1,userId:1,role:1},function(err,usersx) {
             if (err)
                 res.send({result: false, message: "Oops Something went wrong - please try again"});
-            res.send(users);
+            res.send(usersx);
         }).sort({'username':1});
     },
 
@@ -307,7 +306,9 @@ var user = {
                             timeoutTime = 11000;
                             // commands to get finger print
                         }
-                        user.adminCommand(req,res,userxm);
+                        WS.send(JSON.stringify({result:true,message:"'" + req.body.username+"' Set your RF-ID" ,type:"A"}), function (ack) {
+                            console.log(" ACK :::::: "  + ack);
+                        });
                         setTimeout(function () {
                             if(req.body.type === "finger"){
                                 // commands to clean finger print state to listening
@@ -341,6 +342,22 @@ var user = {
         else{
             res.send({result:false,message:"504 Bad Request"});
         }
+    },
+    logout:function(req,res){
+        userSchema.update({loggedIn:true},{
+                $set:{
+                    loggedIn:false,
+                    sampling:false,
+                    samplingType : ""
+                }},function(err,result){
+                if(err) throw err;
+                if(result.n > 0){
+                    res.send(true);
+                }
+                else{
+                    res.send({result:false,message:"No One logged in "});
+                }
+        });
     },
     takeSample : function(req, res){
         userSchema.findOne({sampling:true},{username:1,fullName:1,userId:1,rfId:1,fingerPrint:1},function(err,userx) {
@@ -382,7 +399,11 @@ var user = {
                                     data: "RFID-Sample",
                                 };
                                 Logs.create(logObject);
+                                WS.send(JSON.stringify({result:true,type:"R",message:"RFID Registered : " +userx.username +" "}), function (ack) {
+                                    console.log(" ACK :::::: "  + ack);
+                                });
                                 res.send({result:true,type:"R",message:"RFID Registered : " +userx.username +" "}); // access granted
+                                
                             }
                             else{
                                 let date = new Date().toString();
@@ -397,6 +418,9 @@ var user = {
                                     data: "RFID-Sample-Failed",
                                 };
                                 Logs.create(logObject);
+                                WS.send(JSON.stringify({result:false,type:"R",message:"RFID Not Registered : " +userx.username +" "}), function (ack) {
+                                    console.log(" ACK :::::: "  + ack);
+                                });
                                 if(sendResponse) {
                                     res.send({result:false,type:"R",message:"RFID Not Registered : " +userx.username +" "}); // access granted
                                 }
@@ -440,7 +464,10 @@ var user = {
                                         type: "Access", // Access - Command - Admin
                                         data: "Authenticated / RFID : "+rfId,
                                     };
-                                    res.send({result:true,type:"G",message:"Wellcome " + usr.username + " "});
+                                    WS.send(JSON.stringify({result:true,type:"G",message:"Wellcome " + usr.username + " ",role:usr.role}), function (ack) {
+                                        console.log(" ACK :::::: "  + ack);
+                                    });
+                                    res.send({result:true,type:"G",message:"Wellcome " + usr.username + " ",role:usr.role});
                                 }
                                 else {
                                     console.log("Not Authenticated");
@@ -455,6 +482,13 @@ var user = {
                                     }
                                         authenticated = "Invalid RFID";
                                         Logs.create(logObject);
+                                        WS.send(JSON.stringify({
+                                            result: false,
+                                            message: "Access Denied",
+                                            type : "D"
+                                    }), function (ack) {
+                                            console.log(" ACK :::::: "  + ack);
+                                        });
                                         res.send({
                                             result: false,
                                             message: "Access Denied",
@@ -558,20 +592,7 @@ var user = {
                res.send({result:false,message:"No logs found"});
            }
         });
-    },
-    adminCommand:function(req,res,usr){
-        if(!usr){
-            usr = lastLoggedInAdmin;
-        }
-        if(WS!==null) {
-            if (usr.role === "admin" || usr.role === "superuser"){
-                WS.send("A", function (ack) {
-                    console.log(" ACK :::::: "  + ack);
-                    
-                });
-            }
-        }
-    }     
+    },  
 };
 
 module.exports = user;

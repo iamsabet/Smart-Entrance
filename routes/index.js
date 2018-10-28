@@ -58,9 +58,6 @@ router.get('/login', function(req,res){
     });
 });
 
-router.post('/client/takeSample', function(req, res) {
-    users.takeSample(req,res);
-});
 
 router.get('/admin/getUserInfo/:uuid', function(req, res) {
     validateRequest(req,res,function(callback) {
@@ -129,15 +126,9 @@ router.post('/admin/takeSampleState', function(req, res) {
         }
     });
 });
-router.post('/admin/takeSampleState', function(req, res) {
-    validateRequest(req,res,function(callback) {
-        if(callback) {
-            users.SampleState(req,res);
-        }
-        else{
-            res.send({result:false,message:"Oops"});
-        }
-    });
+router.post('/client/takeSampleState', function(req, res) {
+    users.SampleState(req,res,null);
+        
 });
 router.post('/admin/searchUsers', function(req, res) {
     validateRequest(req,res,function(callback) {
@@ -192,4 +183,17 @@ router.get('/admin/getUsers', function(req, res) {
     });
 });
 
+
+router.post('/client/takeSample', function(req, res) {
+    users.takeSample(req,res);
+});
+router.post('/client/logout', function(req, res) {
+    users.logout(req,res);
+});
+router.get('/client', function(req, res) {
+    res.render('client.html');
+});
+router.get('/client/getUsers', function(req, res) {
+    users.getAll(req,res);
+});
 module.exports = router;
