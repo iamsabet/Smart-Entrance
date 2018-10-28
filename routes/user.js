@@ -464,10 +464,10 @@ var user = {
                                         type: "Access", // Access - Command - Admin
                                         data: "Authenticated / RFID : "+rfId,
                                     };
-                                    WS.send(JSON.stringify({result:true,type:"G",message:"Wellcome " + usr.username + " ",role:usr.role}), function (ack) {
+                                    WS.send(JSON.stringify({result:true,type:"G",message:"Wellcome " + usr.username,role:usr.role}), function (ack) {
                                         console.log(" ACK :::::: "  + ack);
                                     });
-                                    res.send({result:true,type:"G",message:"Wellcome " + usr.username + " ",role:usr.role});
+                                    res.send({result:true,type:"G",message:"Wellcome " + usr.username,role:usr.role});
                                 }
                                 else {
                                     console.log("Not Authenticated");
