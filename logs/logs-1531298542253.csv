@@ -1,0 +1,72 @@
+"date","username","role","classId","className","type","data"
+"Tue Jul 10 2018 13:21:44","Naseh","admin",0,"null","Access","Authenticated / RFID : 1354144117102"
+"Tue Jul 10 2018 13:21:50","Naseh","Admin",208,"null","Command","open"
+"Tue Jul 10 2018 13:41:27","Khazaei","student",0,"null","Access","Authenticated / RFID : 18725319321146"
+"Tue Jul 10 2018 13:41:27","Khazaei","student",213,"Msc. Computer site","Access","Authorized"
+"Tue Jul 10 2018 13:41:29","Khazaei","student",213,"Msc. Computer site","Command","open"
+"Tue Jul 10 2018 13:41:27","Khazaei","student",213,"Msc. Computer site","Access","logged out"
+"Tue Jul 10 2018 13:42:29","Elec , Comm Department","admin",213,"Msc. Computer site","timeout","timeout-student"
+"Tue Jul 10 2018 13:42:29","Naseh","Admin",213,"null","Command","close"
+"Tue Jul 10 2018 13:44:47","Naseh","admin",0,"null","Access","Authenticated / RFID : 5536103182194"
+"Tue Jul 10 2018 13:44:52","Naseh","Admin",202,"null","Command","close"
+"Tue Jul 10 2018 17:51:54","Naseh","admin",0,"null","Access","Authenticated / RFID : 1354144117102"
+"Tue Jul 10 2018 17:52:00","Naseh","Admin",208,"null","Command","close"
+"Tue Jul 10 2018 17:53:53","Amirani","student",0,"null","Access","Authenticated / RFID : 139912272138"
+"Tue Jul 10 2018 17:53:53","Amirani","student",213,"Msc. Computer site","Access","Authorized"
+"Tue Jul 10 2018 17:53:54","Amirani","student",213,"Msc. Computer site","Command","open"
+"Tue Jul 10 2018 17:53:53","Amirani","student",213,"Msc. Computer site","Access","logged out"
+"Tue Jul 10 2018 17:54:54","Elec , Comm Department","admin",213,"Msc. Computer site","timeout","timeout-student"
+"Tue Jul 10 2018 17:54:54","Naseh","Admin",213,"null","Command","close"
+"Tue Jul 10 2018 18:29:19","Khazaei","student",0,"null","Access","Authenticated / RFID : 18725319321146"
+"Tue Jul 10 2018 18:29:19","Khazaei","student",213,"Msc. Computer site","Access","Authorized"
+"Tue Jul 10 2018 18:29:20","Khazaei","student",213,"Msc. Computer site","Command","open"
+"Tue Jul 10 2018 18:29:19","Khazaei","student",213,"Msc. Computer site","Access","logged out"
+"Tue Jul 10 2018 18:30:20","Naseh","Admin",213,"null","Command","close"
+"Tue Jul 10 2018 18:30:20","Elec , Comm Department","admin",213,"Msc. Computer site","timeout","timeout-student"
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+"Wed Jul 11 2018 09:02:36","Naseh","admin",0,"null","Access","Authenticated / RFID : 1354144117102"
+"Wed Jul 11 2018 09:02:46","Naseh","Admin",206,"null","Command","open"
+"Wed Jul 11 2018 09:28:03","Naseh","admin",0,"null","Access","Authenticated / RFID : 5536103182194"
+"Wed Jul 11 2018 09:28:09","Naseh","Admin",202,"null","Command","open"
+"Wed Jul 11 2018 09:47:47","Naseh","admin",0,"null","Access","Authenticated / RFID : 1354144117102"
+"Wed Jul 11 2018 09:48:05","Naseh","Admin",205,"null","Command","open"
+"Wed Jul 11 2018 09:48:05","Naseh","Admin",205,"null","Command","open"
+"Wed Jul 11 2018 11:57:05","Naseh","admin",0,"null","Access","Authenticated / RFID : 1354144117102"
+"Wed Jul 11 2018 11:57:13","Naseh","Admin",208,"null","Command","open"
+"Wed Jul 11 2018 12:20:01","Mohammad Pirouzmand","System",208,,"Command","timeout close"
+"Wed Jul 11 2018 12:26:16","Naseh","admin",0,"null","Access","Authenticated / RFID : 1354144117102"
+"Wed Jul 11 2018 12:26:30","Naseh","Admin",205,"null","Command","close"
+"Wed Jul 11 2018 12:26:32","Naseh","Admin",202,"null","Command","close"
+"Wed Jul 11 2018 12:26:34","Naseh","Admin",206,"null","Command","close"
+"Wed Jul 11 2018 12:35:14","Naseh","admin",0,"null","Access","Authenticated / RFID : 5536103182194"
+"Wed Jul 11 2018 12:35:20","Naseh","Admin",202,"null","Command","open"
+"Wed Jul 11 2018 12:35:52","Naseh","Admin",202,"null","Command","close"
+"Wed Jul 11 2018 13:04:50","null","null",0,"null","Access","Not Authenticated / RFID : 97241207986"
+"Wed Jul 11 2018 13:04:56","Salman Haj Aghasi","teacher",0,"null","Access","Authenticated / RFID : 3290213123212"
+"Wed Jul 11 2018 13:05:01","Salman Haj Aghasi","teacher",0,"null","Access","Authenticated / RFID : 3290213123212"
