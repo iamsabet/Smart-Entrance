@@ -64,7 +64,7 @@
                     let zz = false;
                     let data = null;
                     data = JSON.parse(received_msg);
-                    if(data.role && ( data.role==="superuser" || data.role === "admin")){
+                    if(data.role && ( (data.role ==="superuser") ||(data.role === "admin"))){
                         zz = true;
                     }
                     showServerResponse(data.type+"/"+data.message,zz);
