@@ -64,6 +64,7 @@
                     let zz = false;
                     let data = null;
                     data = JSON.parse(received_msg);
+                    debugger;
                     if(data.role && ( (data.role ==="superuser") ||(data.role === "admin"))){
                         zz = true;
                     }
@@ -94,6 +95,7 @@
         }
         else if(message.startsWith("G")){
             $(".clientButtons span").html('Access Granted ,' + message.split("/")[1]);
+            debugger;
             if(admin){
                 $("#admin").addClass("show");
                 getAllUsers();
