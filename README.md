@@ -1,15 +1,16 @@
 # Smart-Entrance
 
-A building management system for controling door locks
+A building management system for controlling door locks
 
-# Guide
+# Setup Documentaion
 
-node server and mongodb should be runned to use project.
+node server and mongodb should be runned to use the project.
 
 project location: /home/pi/Smart-Entrance
+
 database location: /db
 
-[mongodb query guide](https://docs.mongodb.com/manual/tutorial/query-documents/)
+[Mongodb query guide](https://docs.mongodb.com/manual/tutorial/query-documents/)
 
 Raspberry startup commands:
 
@@ -25,7 +26,7 @@ node /home/pi/Smart-Entrance/bin/www &
 sudo node /home/pi/node_modules/node-red/red.js
 ```
 
-opening chrome fullscreen (kiosk mode)
+Opening chrome fullscreen (kiosk mode)
 
 sudo nano /home/pi/.config/lxsession/LXDE-pi/autostart
 ```
@@ -61,3 +62,5 @@ hdmi_cvt 1024 600 60 6 0 0 0
 hdmi_drive=1
 enable_uart=1
 ```
+
+# Hardware documentation
