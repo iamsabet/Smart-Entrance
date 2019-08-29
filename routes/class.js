@@ -17,6 +17,7 @@ wss.on('connection', function connection(ws) {
     });
 });
 /* GET home page. */
+
 var clas = {
 
     getAll: function(req, res,username,publicx,callback) {

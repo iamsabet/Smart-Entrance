@@ -6,15 +6,15 @@ A building management system for controling door locks
 
 node server and mongodb should be runned to use project.
 
-database location:
-```
-/db
-```
+project location: /home/pi/Smart-Entrance
+database location: /db
+
+[mongodb query guide](https://docs.mongodb.com/manual/tutorial/query-documents/)
 
 Raspberry startup commands:
+
 Sudo nano /etc/rc.local
 ``` bash
-npm install vue-material --save
 cd /home/pi/mongodb/core/
 sudo ./mongod --repair &
 sleep 2s &
@@ -25,10 +25,10 @@ node /home/pi/Smart-Entrance/bin/www &
 sudo node /home/pi/node_modules/node-red/red.js
 ```
 
-opening chrome fullscreen
-```
-sudo nano /home/pi/.config/lxsession/LXDE-pi/autostart
+opening chrome fullscreen (kiosk mode)
 
+sudo nano /home/pi/.config/lxsession/LXDE-pi/autostart
+```
 @lxpanel --profile LXDE-pi
 #@pcmanfm --desktop --profile LXDE-pi
 @pcmanfm --desktop
@@ -47,8 +47,6 @@ crontab -l
 ```
 sudo nano /home/pi/Documents/mycronjobs.txt
 ```
-
-
 
 Lcd settings:
 Sudo nano /boot/config.txt
