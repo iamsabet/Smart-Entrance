@@ -2,6 +2,10 @@
 
 A building management system for controlling door locks
 
+# Hardware documentation
+
+See the SE Technical pdf file
+
 # Setup Documentaion
 
 node server and mongodb should be runned to use the project.
@@ -63,4 +67,4 @@ hdmi_drive=1
 enable_uart=1
 ```
 
-# Hardware documentation
+
