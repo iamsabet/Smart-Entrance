@@ -8,7 +8,7 @@ let extraRight = 60;
 var Logs = new logSchema();
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({port:3002});
+const wss = new WebSocket.Server({port:3003});
 var WS = null;
 wss.on('connection', function connection(ws) {
     WS = ws;
@@ -17,7 +17,6 @@ wss.on('connection', function connection(ws) {
     });
 });
 /* GET home page. */
-
 var clas = {
 
     getAll: function(req, res,username,publicx,callback) {

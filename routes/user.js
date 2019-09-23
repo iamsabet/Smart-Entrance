@@ -18,7 +18,7 @@ var extraRight = 60;
 
 const WebSocket = require('ws');
 
-var wss = new WebSocket.Server({port:3003});
+const wss = new WebSocket.Server({port:3002});
 var WS = null;
 wss.on('connection', function connection(ws) {
     WS = ws;
@@ -712,16 +712,7 @@ var user = {
             }
             else if (cls.length > 0) {
                 if (userx) {
-                    let updatesx = {
-                        class: cls[0],
-                        user: userx
-                    };
-                    let classF = cls[0];
-                    if(cls.length === 2){
-                        updatesx.class2 = cls[1];
-                        classF = cls[1];
-                    }
-                    if((thisLeft - cls[0].right > 21) && (!updatesx.class2)){
+                    if(thisLeft - cls[0].right > 21){
                         let date = new Date().toString();
                         let logObject = {
                             date: date.split(" GMT")[0],
@@ -736,10 +727,13 @@ var user = {
                         res.send({result:false,message:"' "+ userx.username +"' Your class has been closed automaticly by timeout , but we logged your recent effort"});
                     }
                     else {
-                        if((thisLeft - cls[0].right > 21) && updatesx.class2){
-                            updatesx.class = cls[1];
-                            delete updatesx.class2;                            
-                        }
+												let updatesx = {
+														class: cls[0],
+														user: userx
+												};
+												if(cls.length === 2){
+													updatesx.class2 = cls[1];
+												}
                         userSchema.findOneAndUpdate({username: userx.username}, {
                             $set: {
                                 extraData: updatesx,
@@ -751,9 +745,9 @@ var user = {
                                 let date = new Date().toString();
                                 let logObject = {
                                     date: date.split(" GMT")[0],
-                                    classId: classF.classId,
+                                    classId: cls[0].classId,
                                     username: userx.username,
-                                    className: classF.className,
+                                    className: cls[0].name,
                                     role: userx.role,
                                     type: "Access", // Access - Command - Admin
                                     data: "Authorized",
@@ -770,17 +764,19 @@ var user = {
                                         fullName: 1,
                                         command: 1
                                     }, function (err, resultz) {
-                                        if (resultz){
-                                            if(resultz.extraData){
-                                                if(resultz.extraData.class){
-                                                        res.send({
-                                                                classId: resultz.extraData.class.classId,
-                                                                command: resultz.command
-                                                        });
-                                                    }
-                                                }
+                                        if (resultz) {
+                                            if (resultz.extraData && resultz.extraData.class) {
+
+                                                res.send({
+                                                    classId: resultz.extraData.class.classId,
+                                                    command: resultz.command
+                                                });
+                                            }
+                                            else {
+                                                res.send({result: false, message: "Oops Something went wrong"});
+                                            }
                                             resultz.save();
-                                            userSchema.updateMany({}, {
+                                            userSchema.update({username: userx.username}, {
                                                 $set: {
                                                     extraData: {},
                                                     command: "",
@@ -791,9 +787,9 @@ var user = {
                                                 if (res.n > 0) {
                                                     logObject = {
                                                         date: date.split(" GMT")[0],
-                                                        classId: classF.classId,
+                                                        classId: cls[0].classId,
                                                         username: userx.username,
-                                                        className: classF.className,
+                                                        className: cls[0].name,
                                                         role: userx.role,
                                                         type: "Access", // Access - Command - Admin
                                                         data: "logged out",
@@ -803,9 +799,9 @@ var user = {
                                                 else {
                                                     logObject = {
                                                         date: date.split(" GMT")[0],
-                                                        classId: classF.classId,
+                                                        classId: cls[0].classId,
                                                         username: resultz.username,
-                                                        className: classF.className,
+                                                        className: cls[0].name,
                                                         role: userx.role,
                                                         type: "Access", // Access - Command - Admin
                                                         data: "log out failed",
@@ -1060,30 +1056,28 @@ var user = {
                 else if(result.role === "teacher") {
 
                     let date = new Date().toString();
-                    if (result.extraData.class.accessProject !== null || (result.extraData.class2 && (result.extraData.class2.accessProject !== null))) {
-                        if ((req.body) && (req.body.classId) && (!isNaN(req.body.classId))&& (result.extraData.class) && ((parseInt(req.body.classId) === result.extraData.class.accessProject) || ((result.extraData.class2)&& (parseInt(req.body.classId) === result.extraData.class2.accessProject)))) {
-                            let classId = result.extraData.class.classId;
-                            let id = result.extraData.class.id;
-                            let className = result.extraData.class.className;
-                            let accessProject = result.extraData.class.accessProject;
+                    console.log((req.body) && (req.body.classId) && (!isNaN(req.body.classId)) && ((result.extraData.class.accessProject === null) || (parseInt(req.body.classId) === result.extraData.class.accessProject)));
+                    if (result.extraData.class.accessProject !== null) {
+                        if ((req.body) && (req.body.classId) && (!isNaN(req.body.classId)) && ((result.extraData.class.accessProject === null) || (parseInt(req.body.classId) === result.extraData.class.accessProject))) {
 
-                            if(result.extraData.class2 && parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
-                                classId = parseInt(result.extraData.class2.classId);
-                                id = result.extraData.class2.id ;
-                                accessProject = result.extraData.class2.accessProject;
-                                className = result.extraData.class2.className
-                            }
-
+													let classId = result.extraData.class.classId;
+													let id = result.extraData.class.id;
+													let className = result.extraData.class.className;
+													if(parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
+														classId = parseInt(result.extraData.class2.classId);
+														id = result.extraData.class2.id ;
+														className = result.extraData.class2.className
+													}
+													
                             result.save();
                             userSchema.update({username: result.username}, {
                                 $set: {
-                                    "extraData.class.classId": accessProject,
+                                    "extraData.class.classId": classId,
                                     command: "O",
                                     loggedIn: false
                                 }
                             }, function (err, resx) {
                                 if (resx.n > 0) {
-
                                     classSchema.findOneAndUpdate({
                                         classId: classId,
                                     }, {$set: {situation: "open"}}, function (err, cls2) { // command on project room 202
@@ -1091,7 +1085,7 @@ var user = {
                                         if (cls2) {
                                             let logObject = {
                                                 date: date.split(" GMT")[0],
-                                                classId: accessProject || 0,
+                                                classId: result.extraData.class.accessProject || 0,
                                                 username: result.extraData.class.ostadUsername,
                                                 className: "Project Room",
                                                 role: result.role,
@@ -1101,10 +1095,10 @@ var user = {
                                             Logs.create(logObject);
                                             let presentObject = {
                                                 date: date.split(" GMT")[0],
-                                                classId: classId || 0,
+                                                classId: result.extraData.class.classId || 0,
                                                 username: result.username,
-                                                className: className,
-                                                class_id : id
+                                                className: cls2.name,
+                                                class_id : result.extraData.class.id
                                             };
                                             Presents.create(presentObject);
                                             res.send({result: true, command: "On", data: result});
@@ -1112,14 +1106,14 @@ var user = {
                                             setTimeout(function () {
                                                 user.adminCommand({
                                                     body: {
-                                                        classId: accessProject,
+                                                        classId: result.extraData.class.accessProject,
                                                         command: "close"
                                                     }
                                                 }, null, lastLoggedInAdmin);
                                                 let date2 = new Date().toString();
                                                 let logObject2 = {
                                                     date: date2.split(" GMT")[0],
-                                                    classId: accessProject || 0,
+                                                    classId: result.extraData.class.accessProject || 0,
                                                     username: result.extraData.class.ostadUsername,
                                                     className: "Project Room",
                                                     role: "admin",
@@ -1134,17 +1128,15 @@ var user = {
                             });
                         }
                         else{
-                            let classId = result.extraData.class.classId;
-                            let id = result.extraData.class.id;
-                            let className = result.extraData.class.className;
-                            let accessProject = result.extraData.class.accessProject;
+													let classId = result.extraData.class.classId;
+													let id = result.extraData.class.id;
+													let className = result.extraData.class.className;
 
-                            if(result.extraData.class2 && result.extraData.class2.classId && parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
-                                classId = parseInt(result.extraData.class2.classId);
-                                id = result.extraData.class2.id ;
-                                className = result.extraData.class2.className;
-                                accessProject = result.extraData.class2.accessProject;
-                            }
+													if(parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
+														classId = parseInt(result.extraData.class2.classId);
+														id = result.extraData.class2.id ;
+														className = result.extraData.class2.className
+													}
                           classSchema.findOneAndUpdate({
                                 id: id,
                                 classId: classId
@@ -1167,9 +1159,9 @@ var user = {
                                     let date = new Date().toString();
                                     let logObject = {
                                         date: date.split(" GMT")[0],
-                                        classId: classId || 0,
+                                        classId: clas.classId || 0,
                                         username: clas.ostadUsername,
-                                        className: className,
+                                        className: clas.name,
                                         role: "teacher",
                                         type: "Command", // Access - Command - Admin
                                         data: "open",
@@ -1177,11 +1169,9 @@ var user = {
                                     Logs.create(logObject);
                                     userSchema.update({
                                         loggedIn: true,
-                                        username : clas.ostadUsername
-                                    }, {$set: {command: "O", loggedIn: false,"extraData.class.classId":clas.classId}}, function (err, resx) {
+                                    }, {$set: {command: "O", loggedIn: false}}, function (err, resx) {
                                         if (err) throw err;
                                         if (resx.n > 0) {
-
                                             let logObject = {
                                                 date: date.split(" GMT")[0],
                                                 classId: classId || 0,
@@ -1218,13 +1208,11 @@ var user = {
 											let classId = result.extraData.class.classId;
 											let id = result.extraData.class.id;
 											let className = result.extraData.class.className;
-											let accessProject = result.extraData.class.accessProject;
-
-											if(result.extraData.class2 && parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
+											console.log(parseInt(result.extraData.class2.classId) === parseInt(req.body.classId));
+											if(parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
 												classId = parseInt(result.extraData.class2.classId);
 												id = result.extraData.class2.id ;
-												className = result.extraData.class2.className;
-												accessProject = result.extraData.class2.accessProject;
+												className = result.extraData.class2.className
 											}
                         classSchema.findOneAndUpdate({
                             id: id,
@@ -1248,7 +1236,7 @@ var user = {
                                 let date = new Date().toString();
                                 let logObject = {
                                     date: date.split(" GMT")[0],
-                                    classId: classId || 0,
+                                    classId: clas.classId || 0,
                                     username: clas.ostadUsername,
                                     className: clas.name,
                                     role: "teacher",
@@ -1258,7 +1246,7 @@ var user = {
                                 Logs.create(logObject);
                                 userSchema.update({
                                     loggedIn: true,
-                                }, {$set: {command: "O", loggedIn: false,"extraData.class.classId": classId}}, function (err, resx) {
+                                }, {$set: {command: "O", loggedIn: false}}, function (err, resx) {
                                     if (err) throw err;
                                     if (resx.n > 0) {
                                         let logObject = {
@@ -1276,8 +1264,8 @@ var user = {
                                             date: date.split(" GMT")[0],
                                             classId: classId || 0,
                                             username: result.username,
-                                            className: className,
-                                            class_id : id
+                                            className: clas.name,
+                                            class_id : className
                                         };
                                         Presents.create(presentObject);
                                     }
@@ -1326,7 +1314,7 @@ var user = {
 										let id = result.extraData.class.id;
 										let className = result.extraData.class.className;
 
-										if(result.extraData.class2 && parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
+										if(parseInt(result.extraData.class2.classId) === parseInt(req.body.classId)){
 											classId = parseInt(result.extraData.class2.classId);
 											id = result.extraData.class2.id ;
 											className = result.extraData.class2.className
@@ -1377,7 +1365,7 @@ var user = {
                                         userSchema.update({loggedIn: true}, {
                                             $set: {
                                                 command: "F",
-																								"extraData.class.classId": classId,
+																								classId:classId,
                                                 loggedIn: false
                                             }
                                         }, function (err, resx) {
@@ -1401,7 +1389,7 @@ var user = {
                                         userSchema.update({loggedIn: true}, {
                                             $set: {
                                                 command: "N",
-																								"extraData.class.classId": classId,
+																								classId:classId,
                                                 loggedIn: false
                                             }
                                         }, function (err, resx) {
@@ -1430,7 +1418,7 @@ var user = {
                                     userSchema.update({loggedIn: true}, {
                                         $set: {
                                             command: "F",
-																						"extraData.class.classId": classId,
+																						classId:classId,
                                             loggedIn: false
                                         }
                                     }, function (err, resx) {
