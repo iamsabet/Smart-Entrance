@@ -28,7 +28,7 @@
     "sys": "latest"
   },
   "devDependencies": {
-    "mongoose": "^5.0.2",
+    "mongoose": "^5.7.5",
     "ws": "^5.2.0"
   }
 }
