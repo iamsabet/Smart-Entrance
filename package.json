@@ -14,7 +14,7 @@
     "ejs": "~2.5.7",
     "express": "~4.15.5",
     "express-session": "^1.15.6",
-    "json2csv": "^3.11.5",
+    "json2csv": "^5.0.7",
     "jwt-simple": "^0.5.1",
     "moment": "^2.22.1",
     "moment-jalaali": "^0.7.2",
