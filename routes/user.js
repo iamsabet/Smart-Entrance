@@ -19,12 +19,34 @@ var extraRight = 60;
 const WebSocket = require('ws');
 
 const wss = new WebSocket.Server({port:3002});
+
+x = "F"
 var WS = null;
 wss.on('connection', function connection(ws) {
     WS = ws;
     ws.on('message', function incoming(message) {
         console.log('received: %s', message);
     });
+    var CronJob = require('cron').CronJob;
+
+
+    new CronJob('5 * * * * *', function() {
+        com = "F"
+        if (x==="F"){
+            com = "O" // open
+            x = "O"
+        }
+        else{
+            com = "F"
+            x = "F"
+        }
+        classId = 205
+        console.log("send :" + classId + "/"+com)
+        WS.send((classId + com).toString(), function (ack) {
+            console.log("response :" + ack)
+        })
+    
+    }, null, true);
 });
 /* GET home page. */
 var user = {
@@ -1728,5 +1750,7 @@ var user = {
         });
     },
 };
+
+
 
 module.exports = user;

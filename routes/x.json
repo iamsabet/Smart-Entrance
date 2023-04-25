@@ -1,0 +1,14 @@
+{
+    "username": "sabet",
+    "fullName": "sabet",
+    "userId": "",
+    "sampling": false,
+    "samplingType":"",
+    "rfId":[],
+    "fingerPrint":[],
+    "password" : "$2a$10$iQeyUF5M50rXaYgJmjzQyOIvLeAyavbz4krkxholcRSGWUjN3/Mj",
+    "role": "superuser",
+    "adminCommand":[],
+    "isCommand":false,
+    "loggedIn":false
+}
