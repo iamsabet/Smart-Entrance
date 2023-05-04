@@ -15,7 +15,8 @@ var userSchema = new Schema({
     command:String,
     extraData : {},
     createdAt:Number,
-    role:String, // student - teacher - admin - superuser
+    fixedClass : Number,
+    role:String, // student - teacher - admin - superuser - superstudent
     updatedAt:Number,
     adminCommand:[],
     isCommand : Boolean,

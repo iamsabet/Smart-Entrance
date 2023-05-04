@@ -26,9 +26,11 @@
         <div class="addUser">
             <h3>Add User</h3>
             <input type="text" placeholder="username" class="username">
+            <input type="number" placeholder="Fixed Class Number" class="fixedClass"><br>
             <select class="role">
                 <option value="student">Student</option>
                 <option value="teacher">Teacher</option>
+                <option value="superstudent">Super Student</option>
             </select>
             <button class="submitUser">Submit</button>
         </div>
@@ -148,6 +150,7 @@
     var username = "";
     var classid = "";
     var lastUserName="";
+    var lastFixedClass = -1;
     var submitMode = "create";
     var turnInterval = null;
     var classNumber = 0;
@@ -240,6 +243,28 @@
         logout();
         window.location.pathname = "/";
     });
+    $("body").on("change",".role",function(){
+    
+    if($(".role").val() === "superstudent"){
+        console.log("g"+$(".role").val())
+        if($(".fixedClass.hide")[0]){
+            
+            if(lastFixedClass > 0){
+                $(".fixedClass").val(lastFixedClass);
+            }
+            else{
+                $(".fixedClass").val("");
+            }
+            $(".fixedClass").removeClass("hide");
+
+        }
+    }
+
+    else if(!$(".fixedClass.hide")[0])
+        $(".fixedClass").addClass("hide");
+        console.log("S"+$(".role").val())
+                    
+    });
     $("body").on("click",".eachUser .editUser",function(){
         $(".addUser").slideDown(300);
         username  = $(this).siblings("span").html();
@@ -321,6 +346,14 @@
         submitMode = "create";
         $(".addUser h3").html("Add User");
         $(".addUser .username").val("");
+        $(".role").val("student")
+        // debugger;
+        $(".addUser .fixedClass").val("");
+        lastFixedClass = -1;
+        if(!$(".fixedClass.hide")[0])
+            $(".fixedClass").addClass("hide");
+        
+        
     });
 
     $("body").on("click","#users .header .newUser.close",function(){
@@ -641,10 +674,15 @@
 
     function submitUser(){
         if (submitMode === "create") {
-            var x = {
-                username: $(".username").val(),
+            let x = {
+                username:$(".username").val(),
                 role :$(".role").val()
             };
+            debugger;
+            if($(".role").val() === "superstudent"){
+                num = $(".fixedClass").val()!=="" ? parseInt($(".fixedClass").val()) : 0
+                x.fixedClass=parseInt(num)   
+            }
             $.ajax(
                 {
                     url: "/admin/addUser",
@@ -658,9 +696,15 @@
                             if($(".userList li span:first-child").html().startsWith("No")){
                                 $(".userList").html("");
                             }
+                            fixedClassTemp = ''
+                            if(x.role==="superstudent"){
+                                fixedClassTemp = `<span> class : ${x.fixedClass} </span>`
+                            }
+              
                             $(".userList").append(`
                                 <li class="eachUser" id="user-${x.username.split(" ").join("-")}">
                                     <span>${x.username}</span>
+                                    ${fixedClassTemp}
                                     <span>${x.role}</span>
                                     <button class="rightArrow ${x.role}" title="Show User"></button>
                                     <button class="sample rfid" title="Get RFID Sample"></button>
@@ -686,12 +730,19 @@
             );
         }
         else if(submitMode === "edit"){
-
+           
             let x = {
                 newUsername:$(".username").val(),
                 username: lastUserName,
                 role :$(".role").val()
             };
+            if($(".role").val() === "superstudent"){
+                num = $(".fixedClass").val()!=="" ? parseInt($(".fixedClass").val()) : 0
+                x.fixedClass=parseInt(num)   
+            }
+            else{
+                x.fixedClass = 0
+            }
             $.ajax(
                 {
                     url: "/admin/editUser",
@@ -703,9 +754,14 @@
                     success: function (res) {
                         if (!res.message) {
                             $(`#user-${lastUserName.split(" ").join("-")}`).remove();
+                            fixedClassTemp = ''
+                            if(x.role==="superstudent"){
+                                fixedClassTemp = `<span> class : ${x.fixedClass} </span>`
+                            }
                             $(".userList").prepend(`
                                 <li class="eachUser" id="user-${x.username.split(" ").join("-")}">
                                     <span>${x.username}</span>
+                                    ${fixedClassTemp}
                                     <span>${x.role}</span>
                                     <button class="rightArrow ${x.role}" title="Show User"></button>
                                     <button class="sample rfid" title="Get RFID Sample"></button>
@@ -782,9 +838,15 @@
             $("#users .header h3").html("Users");
             if (list.length > 0) {
                 $.each(list, function (index, data) {
+                    fixedClassTemp = ''
+                    if(data.role==="superstudent"){
+                        fixedClassTemp = `<span> class : ${data.fixedClass} </span>`
+                    }
+                    
                     $(".userList").append(`
                                 <li class="eachUser" id="user-${list[index].username.split(" ").join("-")}">
                                 <span>${list[index].username}</span>
+                                ${fixedClassTemp}
                                 <span>${list[index].role}</span>
                                 <button class="rightArrow ${list[index].role}" title="Show User"></button>
                                 <button class="sample rfid" title="Get RFID Sample"></button>
@@ -1097,6 +1159,17 @@
             success: function (res) {
                 if (!res.message) {
                     $(".username").val(res.username);
+                    $(".role").val(res.role);
+                    if(res.role==="superstudent"){
+                        lastFixedClass = res.fixedClass;
+                        $(".fixedClass").val(lastFixedClass);
+                        if($(".fixedClass.hide")[0])
+                            $(".fixedClass").removeClass("hide");
+                    }
+                    else{
+                        if(!$(".fixedClass.hide")[0])
+                            $(".fixedClass").addClass("hide");
+                    }
                 }
                 else{
                     alert(res.username);

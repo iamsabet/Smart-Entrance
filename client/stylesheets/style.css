@@ -1,5 +1,5 @@
-a,div,span,p,h2,h3,h4,h5,h6,h1{
-  font-family: "Helvetica Neue";
+*{
+  font-family: monospace !important;
 }
 html{
   position: fixed;
@@ -14,7 +14,7 @@ html{
 body {
   padding: 0;
   margin:0;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 14px monospace, Helvetica, Arial, sans-serif;
   width:100%;
   left:0;
   text-align: center;
@@ -495,9 +495,9 @@ h2{
   float: left;
   clear: left;
   left: 0;
-  padding: 10px 10px 20px;
+  padding: 10px 10px 8px;
   width: 96%;
-  height: 68px;
+  height: auto;
   margin: 5px 0;
   background-color: #ededed;
   -webkit-border-radius: 7px;
@@ -699,14 +699,14 @@ h2{
 .eachClass .publicIcon{
   background-image: url("../images/public.png");
   background-color: transparent;
-  background-size: 100% auto;.
+  background-size: 100% auto;
 }
 .eachClass .studentsList{
   position: relative;
   float: left;
   clear: left;
   left:5px;
-  max-width: 180px;
+  max-width: 333px;
   overflow: hidden;
   word-break: break-word;
   text-overflow: ellipsis;
@@ -717,8 +717,8 @@ h2{
   position: relative;
   display: inline-block;
   float: left;
-  top: -5px;
-  left: 20px;
+  top: 2px;
+  left: 0 px;
   font-size:26px;
   color: #3c6e45;
 }
@@ -977,7 +977,8 @@ h2{
   height: 105px;
   background-color: #dddddd;
   margin: 5px;
-  padding: 8px;
+  padding: 10px 15px;
+  padding-bottom:22px;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
@@ -1037,9 +1038,14 @@ h2{
     float: right;
     clear: right;
 }
+
 #admin .clsList li a{
   left: auto;
   right:0;
+}
+.clientMonitor .classList li a.publicIcon,#admin .clsList li a.publicIcon{
+  left: auto;
+  right:60px !important;
 }
 .clientMonitor .classList li a.close,#admin .clsList li a.close{
     background-image: url("../images/lock.svg");
@@ -1472,4 +1478,8 @@ h2{
 }
 #admin .clsList a{
 
+}
+
+.hide {
+  display: none !important;
 }

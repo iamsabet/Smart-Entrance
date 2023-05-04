@@ -21,7 +21,7 @@ var auth = {
         // Fire a query to your DB and check if the credentials are valid
         auth.validate(username, password,function(callback){
             var userDbObject = callback;
-
+            console.log(userDbObject);
             if (!userDbObject) { // If authentication fails, we send a 401 back
                 res.status(401);
                 res.send({
@@ -47,7 +47,9 @@ var auth = {
                 }, function (err, user) {
                     if (err) console.log(err);
                     if (user) {
+                        console.log(user)
                         let compare = bcrypt.compareSync(password, user.password);
+                        console.log(compare)
                         if (compare === true) {
                             // log log in
                             return callback(user);

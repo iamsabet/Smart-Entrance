@@ -150,8 +150,8 @@
 					success: function (res) {
 							if(res.data){
 								classid = classId;
-									$(`#class-${classid} > a`).addClass("close");
-									$(`#class-${classid} > a`).removeClass("open");
+									$(`#class-${classid} > a.open`).addClass("close");
+									$(`#class-${classid} > a.open`).removeClass("open");
 									$(".clientButtons span").addClass("marginTop");
 									$(".clientButtons span").html("Class " + classid + " is closed");
 									clearInterval(countDown);
@@ -202,22 +202,23 @@
             success: function (res) {
                 if(res.data){
                     classid = classId;
-                    $(`#class-${classid} > a`).removeClass("close");
-                    $(`#class-${classid} > a`).addClass("open");
+                    $(`#class-${classid} > a.close`).addClass("open");
+                    $(`#class-${classid} > a.close`).removeClass("close");
+                    
                     if(me.role==="strudent")
                         $(".clientButtons span").html("Class " + classid + " is opened for 45 seconds for you to reach");
                     else
                         $(".clientButtons span").html("Class " + classid + " is opened");
                     $(".clientButtons span").addClass("marginTop");
                     clearInterval(countDown);
-										$(".clientButtons .on").removeClass("show");
-										$(".clientButtons .off").removeClass("show");
-										$(".clientButtons .on2").removeClass("show");
-										$(".clientButtons .off2").removeClass("show");
-										$(".clientButtons .on").removeClass("activate");
-										$(".clientButtons .off").removeClass("activate");
-										$(".clientButtons .on2").removeClass("activate");
-										$(".clientButtons .off2").removeClass("activate");
+                    $(".clientButtons .on").removeClass("show");
+                    $(".clientButtons .off").removeClass("show");
+                    $(".clientButtons .on2").removeClass("show");
+                    $(".clientButtons .off2").removeClass("show");
+                    $(".clientButtons .on").removeClass("activate");
+                    $(".clientButtons .off").removeClass("activate");
+                    $(".clientButtons .on2").removeClass("activate");
+                    $(".clientButtons .off2").removeClass("activate");
                     $(".clientButtons .onProject").removeClass("show");
                     $(".clientButtons img").addClass("show");
                     $(".clientButtons h2").html("");
@@ -360,7 +361,7 @@
                                     }
                                 }, 1000);
                             }
-                            else if (me.role === "teacher") {
+                            else if (me.role === "teacher" || me.role === "superstudent") {
                                 if (cls.classId !== 0) {
 
                                     $(".clientButtons span").removeClass("marginTop");
@@ -377,42 +378,45 @@
                                       $(".clientButtons .off").addClass("activate");
                                       $(".clientButtons .on").removeClass("show");
                                     }
-																		if(cls.accessProject !== null){
-																			if(cls2){
-																				$(".clientButtons").addClass("small");
-																			}
-                                      $(".clientButtons .onProject").addClass("activate");
-                                      $(".clientButtons .onProject").html("Open Project Room " + cls.accessProject);
-                                      $(".clientButtons .onProject").addClass("show");
+                                    // debugger // check access to project room
+                                    if(cls.accessProject !== null){
+                                        if(cls2){
+                                            $(".clientButtons").addClass("small");
+                                        }
+                                      if(me.role!=="superstudent"){
+                                        $(".clientButtons .onProject").addClass("activate");
+                                        $(".clientButtons .onProject").html("Open Project Room " + cls.accessProject);
+                                        $(".clientButtons .onProject").addClass("show");
+                                      }
                                     }
 
                                     $(".clientButtons img").removeClass("show");
-
-																		if(Object.keys(cls2).length > 0){
-																			$(".clientButtons span").html(`Welcome '${me.username}' your classes Are (${cls.classId} , ${cls2.classId})`);
-																			if (cls2.classId !== 0) {
-																				if (cls2.situation === "close") {
-																					$(".clientButtons .on2").addClass("activate");
-																					$(".clientButtons .on2").html("Open : " + cls2.classId);
-																					$(".clientButtons .on2").addClass("show");
-	                                        $(".clientButtons .off2").removeClass("show");
+                                    
+                                    if(cls2 && (Object.keys(cls2).length > 0)){
+                                        $(".clientButtons span").html(`Welcome '${me.username}' your classes Are (${cls.classId} , ${cls2.classId})`);
+                                        if (cls2.classId !== 0) {
+                                            if (cls2.situation === "close") {
+                                                $(".clientButtons .on2").addClass("activate");
+                                                $(".clientButtons .on2").html("Open : " + cls2.classId);
+                                                $(".clientButtons .on2").addClass("show");
+	                                            $(".clientButtons .off2").removeClass("show");
 		                                    }
 		                                    else if (cls2.situation === "open") {
-																					$(".clientButtons .off2").html("Close : " + cls2.classId);
-																					$(".clientButtons .off2").addClass("show");
+                                            $(".clientButtons .off2").html("Close : " + cls2.classId);
+                                            $(".clientButtons .off2").addClass("show");
 	                                        $(".clientButtons .off2").addClass("activate");
 	                                        $(".clientButtons .on2").removeClass("show");
-		                                    }
-																				if(!$(".clientButtons .onProject.show")[0]){
-																					if(cls2.accessProject !== null){
-																						$(".clientButtons").addClass("small");
+                                        }
+                                    if(!$(".clientButtons .onProject.show")[0]){
+                                        if(cls2.accessProject !== null){
+                                            $(".clientButtons").addClass("small");
 		                                        $(".clientButtons .onProject").addClass("activate");
 		                                        $(".clientButtons .onProject").html("Open Project Room " + cls2.accessProject);
 		                                        $(".clientButtons .onProject").addClass("show");
 			                                    }
-																				}
-																			}
-																		}
+                                            }
+                                        }
+                                    }
 
                                     seconds = 9;
                                     clearInterval(countDown);
@@ -465,7 +469,7 @@
                                     }, 1000);
                                 }
                                 else{
-                                    alert("User " + me.username + " has no role in the system");
+                                    // alert("User " + me.username + " has no role in the system");
                                 }
                             }
                         }
@@ -642,7 +646,7 @@
                 if((cls[index].accessProject !== null) && (cls[index].accessProject !== undefined))
                     project = `Side Access : ${cls[index].accessProject}`;
                 if(cls[index].isPublic) {
-                    publicz = `<button class="publicIcon"></button>
+                    publicz = `<a disable disabled class="publicIcon disable"></a>
                                 <p class="studentsList">students : [ ${cls[index].studentsList.join(", ").toString()} ]</p>
                                 `;
                 }

@@ -14,7 +14,11 @@ var presentSchema = new Schema({
 
 presentSchema.methods.create = function (presObject) {
     let now = Date.now();
-    let timeEdge = now - (14*3600*1000); // 14 hours
+    /// TAIEN TAKLIF SHEEE
+
+    ///
+    // ((()))
+    let timeEdge = now - (14*3600*1000); // 14 hours // WHYYYY ??? 
     presents.findOne({class_id:presObject.class_id,username:presObject.username,createdAt:{$gt:timeEdge}},function(err,result){
         if(err) throw err;
         if(!result){

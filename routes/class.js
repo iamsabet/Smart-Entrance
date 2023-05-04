@@ -38,6 +38,7 @@ var clas = {
                 accessProject:1,
                 isPublic:1,
                 studentsList:1,
+                accessProject:1,
                 rightDate: 1
             }, function (err, classes) {
                 if (err)
@@ -105,6 +106,8 @@ var clas = {
                                 classNumbers.push({
                                     classId: classes[x].classId,
                                     situation: classes[x].situation,
+                                    id: classes[x].id,
+                                    accessProject:classes[x].accessProject,
                                     name: "Project Room",
                                     ostadUsername: "",
                                     leftDate: "",
@@ -119,7 +122,9 @@ var clas = {
                                             classNumbers.push({
                                                 classId: classes[x].classId,
                                                 situation: classes[x].situation,
+                                                id: classes[x].id,
                                                 ostadUsername: classes[x].ostadUsername,
+                                                accessProject:classes[x].accessProject,
                                                 name: classes[x].name,
                                                 leftDate: classes[x].leftDate,
                                                 rightDate: classes[x].rightDate
@@ -130,6 +135,8 @@ var clas = {
                                         emptys.push(classes[x].classId);
                                         classNumbers.push({
                                             classId: classes[x].classId,
+                                            id: classes[x].id,
+                                            accessProject:classes[x].accessProject,
                                             situation: "close",
                                             name: "",
                                             ostadUsername: "",
@@ -144,6 +151,8 @@ var clas = {
                                         classNumbers.push({
                                             classId: classes[x].classId,
                                             situation: classes[x].situation,
+                                            id: classes[x].id,
+                                            accessProject:classes[x].accessProject,
                                             name: "",
                                             ostadUsername: "",
                                             leftDate: "",
@@ -264,6 +273,7 @@ var clas = {
                                                         let date = new Date().toString();
                                                         let logObject = {
                                                             date: date.split(" GMT")[0],
+                                                            id:classesx[z].id,
                                                             classId: classesx[z].classId || 0,
                                                             username: classesx[z].ostadUsername,
                                                             className: classesx[z].className,
@@ -290,6 +300,7 @@ var clas = {
                                                             let logObject = {
                                                                 date: date.split(" GMT")[0],
                                                                 classId: classesx[z].classId || 0,
+                                                                id:classesx[z].id,
                                                                 username: classesx[z].ostadUsername,
                                                                 className: classesx[z].className,
                                                                 role: "System",
@@ -330,6 +341,7 @@ var clas = {
                                                     date: date.split(" GMT")[0],
                                                     classId: classesx[z].classId || 0,
                                                     username: classesx[z].ostadUsername,
+                                                    id:classesx[z].id,
                                                     className: classesx[z].className,
                                                     role: "System",
                                                     type: "Command", // Access - Command - Admin
