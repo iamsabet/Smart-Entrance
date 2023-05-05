@@ -138,6 +138,7 @@ var user = {
                 let userObject = {
                     username:req.body.username,
                     fullName:req.body.fullName,
+                    fixedClass:!isNaN(parseInt(req.body.fixedClass)) ? parseInt(req.body.fixedClass) : 0,
                     userId :"",
                     sampling:false,
                     samplingType:"",
@@ -146,7 +147,6 @@ var user = {
                     password:"",
                     role: role || "teacher",
                     extraData : {},
-                    fixedClass:0,
                     command:"",
                     loggedIn:false,
                     isCommand:false,
@@ -1214,11 +1214,11 @@ var user = {
                         }
                         else{
                             if (clas) {
-                                classSchema.updateMany({
-                                    classId: result.extraData.class.id,
-                                }, {$set: {situation: "open"}}, function (err, cls) {
-                                    if (err) {
-                                }});
+                                // classSchema.updateMany({
+                                //     classId: result.extraData.class.classId,
+                                // }, {$set: {situation: "open"}}, function (err, cls) {
+                                //     if (err) {
+                                // }});
                                 res.send({result: true, command: "On", data: clas});
                                 let date = new Date().toString();
                                 let logObject = {
@@ -1352,11 +1352,11 @@ var user = {
                                             };
                                             Presents.create(presentObject);
                                             res.send({result: true, command: "On", data: result});
-                                            classSchema.updateMany({
-                                                classId: classId,
-                                            }, {$set: {situation: "open"}}, function (err, cls) {
-                                                if (err) {
-                                            }});
+                                            // classSchema.updateMany({
+                                            //     classId: classId,
+                                            // }, {$set: {situation: "open"}}, function (err, cls) {
+                                            //     if (err) {
+                                            // }});
                                             let timeOutTime = 40000;
                                             setTimeout(function () {
                                                 user.adminCommand({
@@ -1410,11 +1410,11 @@ var user = {
                                     Logs.create(logObject1);
                                 }
                                 if (clas) {
-                                    classSchema.updateMany({
-                                        classId: classId,
-                                    }, {$set: {situation: "open"}}, function (err, cls) {
-                                        if (err) {
-                                    }});
+                                    // classSchema.updateMany({
+                                    //     classId: classId,
+                                    // }, {$set: {situation: "open"}}, function (err, cls) {
+                                    //     if (err) {
+                                    // }});
                                     // console.log("updated");
                                     let date = new Date().toString();
                                     let logObject = {
@@ -1494,11 +1494,11 @@ var user = {
                                 Logs.create(logObject1);
                             }
                             if (clas) {
-                                classSchema.updateMany({
-                                    classId: classId,
-                                }, {$set: {situation: "open"}}, function (err, cls) {
-                                    if (err) {
-                                }});
+                                // classSchema.updateMany({
+                                //     classId: classId,
+                                // }, {$set: {situation: "open"}}, function (err, cls) {
+                                //     if (err) {
+                                // }});
                                 // console.log("updated");
                                 let date = new Date().toString();
                                 let logObject = {
@@ -1603,11 +1603,11 @@ var user = {
                         }
                         else{
                             if (clas) {
-                                classSchema.updateMany({
-                                    classId:  result.extraData.class.classId,
-                                }, {$set: {situation: "close"}}, function (err, cls) {
-                                    if (err) {
-                                }});
+                                // classSchema.updateMany({
+                                //     classId:  result.extraData.class.classId,
+                                // }, {$set: {situation: "close"}}, function (err, cls) {
+                                //     if (err) {
+                                // }});
                                 res.send({result: true, command: "Off", data: clas});
                                 let date = new Date().toString();
                                 let logObject = {
@@ -1689,11 +1689,11 @@ var user = {
                             Logs.create(logObject1);
                         }
                         if (cls) {
-                            classSchema.updateMany({
-                                classId:  classId,
-                            }, {$set: {situation: "close"}}, function (err, cls) {
-                                if (err) {
-                            }});
+                            // classSchema.updateMany({
+                            //     classId:  classId,
+                            // }, {$set: {situation: "close"}}, function (err, cls) {
+                            //     if (err) {
+                            // }});
                             
                             let date = new Date().toString();
                             let logObject = {

@@ -23,7 +23,7 @@ router.get('/', function(req, res) {
 });
 router.get('/admin', function(req, res) {
     validateRequest(req,res,function (callback) {
-        console.log(callback);
+        // console.log(callback);
         if(callback){
             res.render("admin.html");
         }

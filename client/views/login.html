@@ -33,6 +33,9 @@
     $("body").on("submit","form",function(event){
        event.preventDefault();
     });
+    $("body").on("click","#giot",function(){
+        window.location.replace("/client");
+    });
     $("body").on("click","#login",function(){
         $.ajax({
             url:"/admin/login",

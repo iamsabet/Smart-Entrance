@@ -76,6 +76,9 @@
         //     checkAdminCommands();
         // },5000);
     });
+    $("body").on("click","#giot",function(){
+        window.location.reload();
+    });
     $("body").on("click",".on.activateAdmin",function(){ // classes list show
         $("#admin").addClass("show");
         getNumberClasses();
@@ -171,8 +174,9 @@
 											$(".clientButtons span").addClass("marginTop");
 											$(".clientButtons span").html("  Enter your RFID Card ");
                                             getNowClasses()
-									},1000);
-									clearInterval(countDown);
+                                            clearInterval(countDown);
+									},3000);
+									
 							}
 							else{
 									$(".clientButtons span").html(res.message);
@@ -181,7 +185,8 @@
 											$(".clientButtons span").addClass("marginTop");
 											$(".clientButtons span").html("  Enter your RFID Card ");
 											clearInterval(countDown);
-									},1000);
+                                            window.location.reload();
+									},3000);
 							}
 					},
 					fail: function (res) {
@@ -228,8 +233,9 @@
                         $(".clientButtons span").addClass("marginTop");
                         $(".clientButtons span").html(" Enter your RFID Card ");
                         getNowClasses()
-                    },1000);
-                    clearInterval(countDown);
+                        clearInterval(countDown);
+                    },3000);
+                    
                 }
                 else{
                     $(".clientButtons span").html(res.message);
@@ -238,7 +244,8 @@
                         $(".clientButtons span").addClass("marginTop");
                         $(".clientButtons span").html(" Enter your RFID Card ");
                         clearInterval(countDown);
-                    },1000);
+                        window.location.reload();
+                    },3000);
                 }
             },
             fail: function (res) {
@@ -485,6 +492,7 @@
                             $(".clientButtons span").html(res.message);
                             setTimeout(function () {
                                 $(".clientButtons span").html("  Enter your RFID Card ");
+                                // window.location.reload();
                             }, 2000);
                         }
                     }
@@ -526,7 +534,8 @@
                     setTimeout(function(){
                         initPage();
                         $(".clientButtons span").html("  Enter your RFID Card ");
-                    },5000);
+                        // window.location.reload();
+                    },3000);
                 }
             },
             fail: function (res) {
@@ -666,7 +675,6 @@
                             <span class="weekDay"> ${classNumber}</span>
                             <span> Room </span>
                             
-                            <span>User : ${cls[index].name}</span>
                             <a class="${cls[index].situation}"></a>
                             <p hidden>${cls[index].id}</p>
 

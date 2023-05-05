@@ -236,7 +236,7 @@ var clas = {
 
         let thisLeft = (thisDay*24*60) + (thisHour*60) + thisMinute;
         let classesList = [];
-        let thisRightNew = thisLeft - extraRight ; //
+        let thisRightNew = thisLeft - extraRight - 40; //
         classSchema.find({$query:{left:{$lt:thisLeft},right:{$gt:thisLeft}},$orderBy:{classId:-1}},{day:1,leftDate:1,rightDate:1,left:1,right:1,id:1,classId:1,name:1,situation:1,ostadUsername:1},function(err,clases) {
             if (!err && clases) {
                 classesList.push(clases);
@@ -294,6 +294,7 @@ var clas = {
                                         else {
                                             if (classesSituationMap[classesx[z].classId] === "close") {
                                                 if (classesx[z].situation === "open") {
+                                                    console.log(((thisLeft - classesx[z].right)))
                                                     if (((thisLeft - classesx[z].right) >= 20) && ((thisLeft - classesx[z].right) <= 22)){
                                                         setTimeout(function() {
                                                             let date = new Date().toString();
@@ -454,37 +455,9 @@ var clas = {
                                 if(err)
                                     res.send({result: false, message: "Oops Something went wrong - please try again5"});
                                 else{
-                                    classes_7 = [];
-                                    if(classes6.length > 0){
-                                        // classesList.push(classes6);
-                                        loggs = []
-                                        for ( c in classes6){
-                                            let clxs = classes6[c];
-                                            usersThatOpenedRooms = [] 
-                                            logSchema.find({$query: {classId:clxs.classId,type:"Command",data:"open"}},function(err,lgs){
-                                                if(err)
-                                                    res.send({result: false, message: "Oops Something went wrong - please try again6"});
-                                                else if(lgs.length > 0){
-                                                    let new_class = clxs;
-                                                    new_class.name = lgs[0].username;
-                                                    
-                                                    classes_7.push(new_class);
-                                                    if(classes_7.length === classes6.length){
-                                                        classesList.push(classes_7);
-                                                        res.send(classesList);
-                                                    }
-                                                    
-                                                }
-                                                else{
-                                                    console.log("No logs found for the recently opened class");
-                                                    res.send(classesList);
-                                                }
-                                            }).sort({createdAt:-1}).limit(1)
-                                        }
-                                    }
-                                    else{
-                                        res.send(classesList);
-                                    }
+                                    
+                                    classesList.push(classes6);
+                                    res.send(classesList);
                                 }
                             });
                             
