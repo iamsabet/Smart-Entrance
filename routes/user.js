@@ -898,101 +898,106 @@ var user = {
                     
                     cls = list_final;
                     // userx
-                    let updatesx = {
-                        class: cls[0],
-                        user: userx
-                    };
-                    if(cls.length === 2){
-                        updatesx.class2 = cls[1];
+                    if(cls.length === 0){
+                        res.send({result:false,message:"No Room Is Available for you right now"})
                     }
-                    userSchema.findOneAndUpdate({username: userx.username}, {
-                        $set: {
-                            extraData: updatesx,
-                            loggedIn: true
+                    else{
+                        let updatesx = {
+                            class: cls[0],
+                            user: userx
+                        };
+                        if(cls.length === 2){
+                            // updatesx.class2 = cls[1];
                         }
-                    }, function (err, result) {
-                        if (err) console.log(err);
-                            if (result) {
-                            let date = new Date().toString();
-                            let logObject = {
-                                date: date.split(" GMT")[0],
-                                classId: cls[0].classId,
-                                username: userx.username,
-                                className: cls[0].name,
-                                role: userx.role,
-                                type: "Access", // Access - Command - Admin
-                                data: "Authorized",
-                            };
-                            result.save();
-                            Logs.create(logObject);
-                            setTimeout(function () {
-                                userSchema.findOne({
+                        userSchema.findOneAndUpdate({username: userx.username}, {
+                            $set: {
+                                extraData: updatesx,
+                                loggedIn: true
+                            }
+                        }, function (err, result) {
+                            if (err) console.log(err);
+                                if (result) {
+                                let date = new Date().toString();
+                                let logObject = {
+                                    date: date.split(" GMT")[0],
+                                    classId: cls[0].classId,
                                     username: userx.username,
-                                }, {
-                                    extraData: 1,
-                                    loggedIn: 1,
-                                    username: 1,
-                                    fullName: 1,
-                                    fixedClass:1,
-                                    command: 1
-                                }, function (err, resultz) {
-                                    if (resultz) {
-                                        if (resultz.extraData && resultz.extraData.class) {
+                                    className: cls[0].name,
+                                    role: userx.role,
+                                    type: "Access", // Access - Command - Admin
+                                    data: "Authorized",
+                                };
+                                result.save();
+                                Logs.create(logObject);
+                                setTimeout(function () {
+                                    userSchema.findOne({
+                                        username: userx.username,
+                                    }, {
+                                        extraData: 1,
+                                        loggedIn: 1,
+                                        username: 1,
+                                        fullName: 1,
+                                        fixedClass:1,
+                                        command: 1
+                                    }, function (err, resultz) {
+                                        if (resultz) {
+                                            if (resultz.extraData && resultz.extraData.class) {
 
-                                            res.send({
-                                                classId: resultz.extraData.class.classId,
-                                                command: resultz.command
+                                                res.send({
+                                                    classId: resultz.extraData.class.classId,
+                                                    command: resultz.command
+                                                });
+                                            }
+                                            else {
+                                                res.send({result: false, message: "Oops Something went wrong"});
+                                            }
+                                            resultz.save();
+                                            userSchema.update({username: userx.username}, {
+                                                $set: {
+                                                    extraData: {},
+                                                    command: "",
+                                                    loggedIn: false
+                                                }
+                                            }, function (err, res) {
+                                                if (err) throw err;
+                                                if (res.n > 0) {
+                                                    logObject = {
+                                                        date: date.split(" GMT")[0],
+                                                        classId: cls[0].classId,
+                                                        username: userx.username,
+                                                        className: cls[0].name,
+                                                        role: userx.role,
+                                                        type: "Access", // Access - Command - Admin
+                                                        data: "logged out",
+                                                    };
+                                                    Logs.create(logObject);
+                                                }
+                                                else {
+                                                    logObject = {
+                                                        date: date.split(" GMT")[0],
+                                                        classId: cls[0].classId,
+                                                        username: resultz.username,
+                                                        className: cls[0].name,
+                                                        role: userx.role,
+                                                        type: "Access", // Access - Command - Admin
+                                                        data: "log out failed",
+                                                    };
+                                                    Logs.create(logObject);
+                                                }
                                             });
                                         }
                                         else {
-                                            res.send({result: false, message: "Oops Something went wrong"});
+                                            res.send({result: false, message: "Oops"});
                                         }
-                                        resultz.save();
-                                        userSchema.update({username: userx.username}, {
-                                            $set: {
-                                                extraData: {},
-                                                command: "",
-                                                loggedIn: false
-                                            }
-                                        }, function (err, res) {
-                                            if (err) throw err;
-                                            if (res.n > 0) {
-                                                logObject = {
-                                                    date: date.split(" GMT")[0],
-                                                    classId: cls[0].classId,
-                                                    username: userx.username,
-                                                    className: cls[0].name,
-                                                    role: userx.role,
-                                                    type: "Access", // Access - Command - Admin
-                                                    data: "logged out",
-                                                };
-                                                Logs.create(logObject);
-                                            }
-                                            else {
-                                                logObject = {
-                                                    date: date.split(" GMT")[0],
-                                                    classId: cls[0].classId,
-                                                    username: resultz.username,
-                                                    className: cls[0].name,
-                                                    role: userx.role,
-                                                    type: "Access", // Access - Command - Admin
-                                                    data: "log out failed",
-                                                };
-                                                Logs.create(logObject);
-                                            }
-                                        });
-                                    }
-                                    else {
-                                        res.send({result: false, message: "Oops"});
-                                    }
-                                });
-                            }, 9000);
+                                    });
+                                }, 9000);
 
-                        }
-                        else {
-                            res.send({result: false, message: "Oops Something Went Wrong"});
-                        }
-                    });
+                            }
+                            else {
+                                res.send({result: false, message: "Oops Something Went Wrong"});
+                            }
+                        });
+                    }
                 });
                
             }
@@ -1209,6 +1214,11 @@ var user = {
                         }
                         else{
                             if (clas) {
+                                classSchema.updateMany({
+                                    classId: result.extraData.class.id,
+                                }, {$set: {situation: "open"}}, function (err, cls) {
+                                    if (err) {
+                                }});
                                 res.send({result: true, command: "On", data: clas});
                                 let date = new Date().toString();
                                 let logObject = {
@@ -1342,6 +1352,11 @@ var user = {
                                             };
                                             Presents.create(presentObject);
                                             res.send({result: true, command: "On", data: result});
+                                            classSchema.updateMany({
+                                                classId: classId,
+                                            }, {$set: {situation: "open"}}, function (err, cls) {
+                                                if (err) {
+                                            }});
                                             let timeOutTime = 40000;
                                             setTimeout(function () {
                                                 user.adminCommand({
@@ -1395,6 +1410,11 @@ var user = {
                                     Logs.create(logObject1);
                                 }
                                 if (clas) {
+                                    classSchema.updateMany({
+                                        classId: classId,
+                                    }, {$set: {situation: "open"}}, function (err, cls) {
+                                        if (err) {
+                                    }});
                                     // console.log("updated");
                                     let date = new Date().toString();
                                     let logObject = {
@@ -1474,6 +1494,11 @@ var user = {
                                 Logs.create(logObject1);
                             }
                             if (clas) {
+                                classSchema.updateMany({
+                                    classId: classId,
+                                }, {$set: {situation: "open"}}, function (err, cls) {
+                                    if (err) {
+                                }});
                                 // console.log("updated");
                                 let date = new Date().toString();
                                 let logObject = {
@@ -1578,6 +1603,11 @@ var user = {
                         }
                         else{
                             if (clas) {
+                                classSchema.updateMany({
+                                    classId:  result.extraData.class.classId,
+                                }, {$set: {situation: "close"}}, function (err, cls) {
+                                    if (err) {
+                                }});
                                 res.send({result: true, command: "Off", data: clas});
                                 let date = new Date().toString();
                                 let logObject = {
@@ -1659,6 +1689,12 @@ var user = {
                             Logs.create(logObject1);
                         }
                         if (cls) {
+                            classSchema.updateMany({
+                                classId:  classId,
+                            }, {$set: {situation: "close"}}, function (err, cls) {
+                                if (err) {
+                            }});
+                            
                             let date = new Date().toString();
                             let logObject = {
                                 date: date.split(" GMT")[0],

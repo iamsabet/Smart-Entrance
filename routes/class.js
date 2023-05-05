@@ -167,7 +167,7 @@ var clas = {
                                 res.send(classNumbers);
                             else
                                 return callback(classNumbers);
-                            console.log(classNumbers);
+                            // console.log(classNumbers);
                         }
                     }
                 }
@@ -373,6 +373,16 @@ var clas = {
             }
         });
     },
+
+    addClassesIds:function(list,classesIds){
+        for (s in list){
+            if(classesIds.indexOf(list[s].classId) === -1){
+                classesIds.push(list[s].classId)
+            }
+        }
+        return classesIds;
+    },
+
     getNowClasses:function(req,res){
         let now = new Date();
         let thisTime = now.toString().split(" ");
@@ -409,28 +419,75 @@ var clas = {
         let thisRightNew = thisLeft - (extraRight - 40); //
 
         let thisLeftAll = (8*24*60) + (thisHour*60) + thisMinute;
+        classesIds = []
+        fields = {day:1,leftDate:1,rightDate:1,left:1,accessProject:1,right:1,id:1,classId:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1};
 
-        classSchema.find({$query:{left:{$lt:thisLeft},right:{$gt:thisLeft},classId:{$ne:202}},$orderBy:{classId:-1}},{day:1,leftDate:1,rightDate:1,left:1,right:1,id:1,classId:1,accessProject:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1},function(err1,classes1) {
+
+        classSchema.find({$query:{left:{$lt:thisLeft},right:{$gt:thisLeft},classId:{$ne:202}},$orderBy:{classId:-1}},fields,function(err1,classes1) {
             if (err1)
                 res.send({result: false, message: "Oops Something went wrong - please try again1"});
             classesList.push(classes1);
-            classSchema.find({$query:{left:{$lt:thisLeftNew,$gte:thisLeft},classId:{$ne:202}},$orderBy:{classId:-1}},{day:1,leftDate:1,rightDate:1,accessProject:1,left:1,right:1,id:1,classId:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1},function(err2,classes2) {
+            classesIds = clas.addClassesIds(classes1,classesIds);
+            classSchema.find({$query:{left:{$lt:thisLeftNew,$gte:thisLeft},classId:{$ne:202}},$orderBy:{classId:-1}},fields,function(err2,classes2) {
                 if (err2)
                     res.send({result: false, message: "Oops Something went wrong - please try again2"});
                 classesList.push(classes2);
-                classSchema.find({$query:{right:{$lte:thisLeft,$gt:thisRightNew},classId:{$ne:202}},$orderBy:{classId:-1}},{day:1,leftDate:1,rightDate:1,left:1,accessProject:1,right:1,id:1,classId:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1},function(err3,classes3) {
+                classesIds = clas.addClassesIds(classes2,classesIds);
+                classSchema.find({$query:{right:{$lte:thisLeft,$gt:thisRightNew},classId:{$ne:202}},$orderBy:{classId:-1}},fields,function(err3,classes3) {
                     if (err3)
                         res.send({result: false, message: "Oops Something went wrong - please try again3"});
                     classesList.push(classes3);
-                    classSchema.find({$query:{left:{$lt:thisLeftAll},right:{$gt:thisLeftAll}},classId:{$ne:202},$orderBy:{classId:-1}},{day:1,leftDate:1,rightDate:1,left:1,accessProject:1,right:1,id:1,classId:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1},function(err4,classes4) {
+                    classesIds = clas.addClassesIds(classes3,classesIds);
+                    classSchema.find({$query:{left:{$lt:thisLeftAll},right:{$gt:thisLeftAll}},classId:{$ne:202},$orderBy:{classId:-1}},fields,function(err4,classes4) {
                         if (err4)
                             res.send({result: false, message: "Oops Something went wrong - please try again4"});
                         classesList.push(classes4);
-                        classSchema.find({$query:{classId:202}},{classId:1,name:1,situation:1,id:1,ostadUsername:1},function(err5,classes5) {
+                        classesIds = clas.addClassesIds(classes4,classesIds);
+                        classSchema.find({$query:{classId:202}},fields,function(err5,classes5) {
                             if (err5)
                                 res.send({result: false, message: "Oops Something went wrong - please try again4"});
                             classesList.push(classes5);
-                            res.send(classesList);
+                            classesIds = clas.addClassesIds(classes5,classesIds);
+
+                            // classes open by superstudent users : + 
+                            classSchema.find({$query:{situation:"open",classId:{$nin:classesIds}}},fields,function(err,classes6){
+                                if(err)
+                                    res.send({result: false, message: "Oops Something went wrong - please try again5"});
+                                else{
+                                    classes_7 = [];
+                                    if(classes6.length > 0){
+                                        // classesList.push(classes6);
+                                        loggs = []
+                                        for ( c in classes6){
+                                            let clxs = classes6[c];
+                                            usersThatOpenedRooms = [] 
+                                            logSchema.find({$query: {classId:clxs.classId,type:"Command",data:"open"}},function(err,lgs){
+                                                if(err)
+                                                    res.send({result: false, message: "Oops Something went wrong - please try again6"});
+                                                else if(lgs.length > 0){
+                                                    let new_class = clxs;
+                                                    new_class.name = lgs[0].username;
+                                                    
+                                                    classes_7.push(new_class);
+                                                    if(classes_7.length === classes6.length){
+                                                        classesList.push(classes_7);
+                                                        res.send(classesList);
+                                                    }
+                                                    
+                                                }
+                                                else{
+                                                    console.log("No logs found for the recently opened class");
+                                                    res.send(classesList);
+                                                }
+                                            }).sort({createdAt:-1}).limit(1)
+                                        }
+                                    }
+                                    else{
+                                        res.send(classesList);
+                                    }
+                                }
+                            });
+                            
                         });
                     });
                 });

@@ -43,7 +43,7 @@
     </div>
     <div class="clientButtons">
         <h2></h2>
-        <span class="marginTop">  Enter your RFID Card or Fingerprint </span>
+        <span class="marginTop">  Enter your RFID Card </span>
         <button class="on">Open</button>
         <button class="off">Close</button>
 				<button class="on2">Open</button>
@@ -70,7 +70,7 @@
         initDate();
         setInterval(function(){
             getNowClasses();
-        }, 60000);
+        }, 15000);
 
         // setInterval(function(){
         //     checkAdminCommands();
@@ -169,8 +169,9 @@
 									setTimeout(function(){
 											initPage();
 											$(".clientButtons span").addClass("marginTop");
-											$(".clientButtons span").html("  Enter your RFID Card or Fingerprint ");
-									},3000);
+											$(".clientButtons span").html("  Enter your RFID Card ");
+                                            getNowClasses()
+									},1000);
 									clearInterval(countDown);
 							}
 							else{
@@ -178,9 +179,9 @@
 									setTimeout(function(){
 											initPage();
 											$(".clientButtons span").addClass("marginTop");
-											$(".clientButtons span").html("  Enter your RFID Card or Fingerprint ");
+											$(".clientButtons span").html("  Enter your RFID Card ");
 											clearInterval(countDown);
-									},3000);
+									},1000);
 							}
 					},
 					fail: function (res) {
@@ -225,8 +226,9 @@
                     setTimeout(function(){
                         initPage();
                         $(".clientButtons span").addClass("marginTop");
-                        $(".clientButtons span").html(" Enter your RFID Card or Fingerprint ");
-                    },3000);
+                        $(".clientButtons span").html(" Enter your RFID Card ");
+                        getNowClasses()
+                    },1000);
                     clearInterval(countDown);
                 }
                 else{
@@ -234,9 +236,9 @@
                     setTimeout(function(){
                         initPage();
                         $(".clientButtons span").addClass("marginTop");
-                        $(".clientButtons span").html(" Enter your RFID Card or Fingerprint ");
+                        $(".clientButtons span").html(" Enter your RFID Card ");
                         clearInterval(countDown);
-                    },3000);
+                    },1000);
                 }
             },
             fail: function (res) {
@@ -263,7 +265,7 @@
                         if (res.alertText) {
                             $(".clientButtons span").html(res.alertText);
                             setTimeout(function () {
-                                $(".clientButtons span").html("  Enter your RFID Card or Fingerprint ");
+                                $(".clientButtons span").html("  Enter your RFID Card ");
                                 initPage();
                             }, 5000);
                         }
@@ -280,7 +282,7 @@
                                 $(".clientButtons h2").html(seconds);
                                 if (seconds === -1) {
                                     clearInterval(countDown);
-                                    $(".clientButtons span").html(" Enter your RFID Card or Fingerprint ");
+                                    $(".clientButtons span").html(" Enter your RFID Card ");
                                     $(".clientButtons .on").removeClass("show");
 																		$(".clientButtons").removeClass("small");
                                     $(".clientButtons .onProject").removeClass("show");
@@ -304,7 +306,7 @@
                             //     $(".clientButtons h2").html(seconds);
                             //     if (seconds === -1) {
                             //         clearInterval(countDown);
-                            //         $(".clientButtons span").html(" Enter your RFID Card or Fingerprint ");
+                            //         $(".clientButtons span").html(" Enter your RFID Card ");
                             //         $(".clientButtons .on").removeClass("show");
                             //         $(".clientButtons .off").removeClass("show");
                             //         $(".clientButtons img").addClass("show");
@@ -349,7 +351,7 @@
                                     $(".clientButtons h2").html(seconds);
                                     if (seconds === -1) {
                                         clearInterval(countDown);
-                                        $(".clientButtons span").html(" Enter your RFID Card or Fingerprint ");
+                                        $(".clientButtons span").html(" Enter your RFID Card ");
                                         $(".clientButtons span").addClass("marginTop");
                                         $(".clientButtons .on").removeClass("show");
                                         $(".clientButtons .off").removeClass("show");
@@ -367,14 +369,14 @@
                                     $(".clientButtons span").removeClass("marginTop");
 
                                     if (cls.situation === "close") {
-																			$(".clientButtons .on").html("Open : " + cls.classId);
-																			$(".clientButtons .on").addClass("show");
+                                    $(".clientButtons .on").html("Open : " + cls.classId);
+                                    $(".clientButtons .on").addClass("show");
                                       $(".clientButtons .on").addClass("activate");
                                       $(".clientButtons .off").removeClass("show");
                                     }
                                     else if (cls.situation === "open") {
-																			$(".clientButtons .off").html("Close : " + cls.classId);
-																			$(".clientButtons .off").addClass("show");
+                                        $(".clientButtons .off").html("Close : " + cls.classId);
+                                        $(".clientButtons .off").addClass("show");
                                       $(".clientButtons .off").addClass("activate");
                                       $(".clientButtons .on").removeClass("show");
                                     }
@@ -426,7 +428,7 @@
                                         $(".clientButtons h2").html(seconds);
                                         if (seconds === -1) {
                                             clearInterval(countDown);
-                                            $(".clientButtons span").html(" Enter your RFID Card or Fingerprint ");
+                                            $(".clientButtons span").html(" Enter your RFID Card ");
                                             $(".clientButtons span").addClass("marginTop");
                                             $(".clientButtons .on").removeClass("show");
 																						$(".clientButtons").removeClass("small");
@@ -457,7 +459,7 @@
                                         $(".clientButtons h2").html(seconds);
                                         if (seconds === -1) {
                                             clearInterval(countDown);
-                                            $(".clientButtons span").html("Enter your RFID Card or Fingerprint");
+                                            $(".clientButtons span").html("Enter your RFID Card");
                                             $(".clientButtons span").addClass("marginTop");
                                             $(".clientButtons .on").removeClass("show");
                                             $(".clientButtons .off").removeClass("show");
@@ -482,7 +484,7 @@
                         if(!res.message.startsWith("No one")) {
                             $(".clientButtons span").html(res.message);
                             setTimeout(function () {
-                                $(".clientButtons span").html("  Enter your RFID Card or Fingerprint ");
+                                $(".clientButtons span").html("  Enter your RFID Card ");
                             }, 2000);
                         }
                     }
@@ -523,7 +525,7 @@
                     $(".clientButtons span").html(res.message);
                     setTimeout(function(){
                         initPage();
-                        $(".clientButtons span").html("  Enter your RFID Card or Fingerprint ");
+                        $(".clientButtons span").html("  Enter your RFID Card ");
                     },5000);
                 }
             },
@@ -575,7 +577,14 @@
                         parseClasses(classesList[0],"white"); // parse Main
                         parseClasses(classesList[3],"white"); // parse Everyday classes (publics mostly)
                         parseClasses(classesList[2],"blue"); // parse until 5min after
-                        if((classesList[0].length === 0) && (classesList[1].length === 0) && (classesList[2].length === 0) && (classesList[3].length === 0)){
+                        if(classesList[5])
+                            parseClasses(classesList[5],"white","superstudent"); // superstudent open ROOMS not classes
+                        
+                        if((classesList[0].length === 0) && 
+                            (classesList[1].length === 0) &&
+                            (classesList[2].length === 0) && 
+                            (classesList[3].length === 0) && 
+                            (classesList[5] && classesList[5].length === 0)){
                             $(".classList").append(`
                            <li class="eachClass">
                                 <span></span>
@@ -617,7 +626,7 @@
 
     }
 
-    function parseClasses(cls,color){
+    function parseClasses(cls,color,mode){
 
         if(color !== "project"){
             $.each(cls, function (index, data) {
@@ -650,22 +659,38 @@
                                 <p class="studentsList">students : [ ${cls[index].studentsList.join(", ").toString()} ]</p>
                                 `;
                 }
-                $(".classList").append(`
-                            <li class="eachClass ${colorClass}" id="class-${cls[index].classId}">
-                                    <span class="weekDay"> ${classNumber}</span>
-                                    <span>${cls[index].name}</span>
-                                    <span cls="pra">${project}</span>
-                                    <span>${cls[index].leftDate.hour}:${cls[index].leftDate.minute} / ${cls[index].rightDate.hour}:${cls[index].rightDate.minute}</span>
-                                    <span>${cls[index].ostadUsername} </span>${publicz}
-                                    <a class="${cls[index].situation}"></a>
-                                    <p hidden>${cls[index].id}</p>
+                if(mode && (mode === "superstudent")){
+                    
+                    $(".classList").append(`
+                        <li class="eachClass ${colorClass}" id="class-${cls[index].classId}">
+                            <span class="weekDay"> ${classNumber}</span>
+                            <span> Room </span>
+                            
+                            <span>User : ${cls[index].name}</span>
+                            <a class="${cls[index].situation}"></a>
+                            <p hidden>${cls[index].id}</p>
 
-                            </li>`);
+                        </li>`);
+                }
+                else{
+                    $(".classList").append(`
+                    <li class="eachClass ${colorClass}" id="class-${cls[index].classId}">
+                            <span class="weekDay"> ${classNumber}</span>
+                            <span>${cls[index].name}</span>
+                            <span cls="pra">${project}</span>
+                            <span>${cls[index].leftDate.hour}:${cls[index].leftDate.minute} / ${cls[index].rightDate.hour}:${cls[index].rightDate.minute}</span>
+                            <span>${cls[index].ostadUsername} </span>${publicz}
+                            <a class="${cls[index].situation}"></a>
+                            <p hidden>${cls[index].id}</p>
+
+                    </li>`);
+                }
+                
             });
         }
         else{
             let colorClass = color || "white";
-
+            
             if(cls.length === 1) {
                 $(".classList").append(`
                   <li class="eachClass ${colorClass}" id="class-${cls[0].classId}">
