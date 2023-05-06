@@ -513,8 +513,12 @@ var clas = {
             }
                 break;
         }
+        
         clas.getAll(null, null,"Number",undefined,function(callback){
             let definedClasses = callback;
+            classSchema.updateMany({},{$set:{situation:"close"}},function(err,reslut){
+
+            });
             for(let x = 0 ; x < definedClasses.length ; x++){
                 setTimeout(function() {
                     clas.timeOutCommand({
@@ -523,6 +527,7 @@ var clas = {
                             command: "close"
                         }
                     }, null, null);
+                    
                 },1500*x);
             }
         });

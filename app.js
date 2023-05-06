@@ -27,17 +27,20 @@ new CronJob('1 * * * * *', function() {
 new CronJob('30 20 * * *', function() {
     console.log("Reset Done ===============");
     classes.clearDayClasses();
-}, null, true);
+}, null, true,'Asia/Tehran');
 
 new CronJob('1 22 * * *', function() {
     console.log("Reset Night ===============");
     classes.clearDayClasses();
-}, null, true);
-
+}, null, true,'Asia/Tehran');
+new CronJob('42 22 * * *', function() {
+    console.log("Reset Night =============== +++ ");
+    classes.clearDayClasses();
+}, null, true,'Asia/Tehran');
 new CronJob('31 21 * * *', function() {
     console.log("Reset Befor Night ===============");
     classes.clearDayClasses();
-}, null, true);
+}, null, true,'Asia/Tehran');
 
 // routes ======================================================================
 

@@ -1603,11 +1603,6 @@ var user = {
                         }
                         else{
                             if (clas) {
-                                // classSchema.updateMany({
-                                //     classId:  result.extraData.class.classId,
-                                // }, {$set: {situation: "close"}}, function (err, cls) {
-                                //     if (err) {
-                                // }});
                                 res.send({result: true, command: "Off", data: clas});
                                 let date = new Date().toString();
                                 let logObject = {
@@ -1689,11 +1684,11 @@ var user = {
                             Logs.create(logObject1);
                         }
                         if (cls) {
-                            // classSchema.updateMany({
-                            //     classId:  classId,
-                            // }, {$set: {situation: "close"}}, function (err, cls) {
-                            //     if (err) {
-                            // }});
+                            classSchema.updateMany({
+                                classId:  classId,
+                            }, {$set: {situation: "close"}}, function (err, cls) {
+                                if (err) {
+                            }});
                             
                             let date = new Date().toString();
                             let logObject = {
