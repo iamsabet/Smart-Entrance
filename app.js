@@ -33,7 +33,7 @@ new CronJob('1 22 * * *', function() {
     console.log("Reset Night ===============");
     classes.clearDayClasses();
 }, null, true,'Asia/Tehran');
-new CronJob('42 22 * * *', function() {
+new CronJob('44 22 * * *', function() {
     console.log("Reset Night =============== +++ ");
     classes.clearDayClasses();
 }, null, true,'Asia/Tehran');
