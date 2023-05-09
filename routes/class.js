@@ -77,7 +77,7 @@ var clas = {
         let thisHour = parseInt(thisTime[4].split(":")[0]);
         let thisMinute = parseInt(thisTime[4].split(":")[1]);
 
-            classSchema.find({$query: {}, $orderBy: {classId: +1}}, {
+            classSchema.find({}, {
                 classId: 1,
                 name: 1,
                 day: 1,
@@ -174,7 +174,7 @@ var clas = {
                 else{
                     res.send({result:false,message:" No Class defined "});
                 }
-            });
+            }).sort({classId:+1});
         }
         else {
             if(publicx){
