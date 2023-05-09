@@ -429,7 +429,14 @@ var clas = {
                 res.send({result: false, message: "Oops Something went wrong - please try again1"});
             classesList.push(classes1);
             classesIds = clas.addClassesIds(classes1,classesIds);
-            classSchema.find({$query:{left:{$lt:thisLeftNew,$gte:thisLeft},classId:{$ne:202}},$orderBy:{classId:-1}},{day:1,leftDate:1,rightDate:1,accessProject:1,left:1,right:1,id:1,classId:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1},function(err2,classes2) {
+            classSchema.find({$and:[
+                {   
+                    $and:[
+                        {left:{$lt:thisLeftNew}},
+                        {left:{$gte:thisLeft}}
+                    ]},
+                {classId:{$ne:202}}
+            ]},{day:1,leftDate:1,rightDate:1,accessProject:1,left:1,right:1,id:1,classId:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1},function(err2,classes2) {
                 if (err2){
                     throw err2;
                     res.send({result: false, message: "Oops Something went wrong - please try again2"});
@@ -466,7 +473,7 @@ var clas = {
                         });
                     });
                 });
-            });
+            }).sort({classId:-1});
         });
     },
     getInfo: function(req, res,id) {
