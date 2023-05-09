@@ -424,12 +424,12 @@ var clas = {
         fields = {day:1,leftDate:1,rightDate:1,left:1,accessProject:1,right:1,id:1,classId:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1};
 
 
-        classSchema.find({$query:{left:{$lt:thisLeft},right:{$gt:thisLeft},classId:{$ne:202}},$orderBy:{classId:-1}},fields,function(err1,classes1) {
+        classSchema.find({$query:{left:{$lt:thisLeft},right:{$gt:thisLeft},classId:{$ne:202}},$orderBy:{classId:-1}},{day:1,leftDate:1,rightDate:1,left:1,right:1,id:1,classId:1,accessProject:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1},function(err1,classes1) {
             if (err1)
                 res.send({result: false, message: "Oops Something went wrong - please try again1"});
             classesList.push(classes1);
             classesIds = clas.addClassesIds(classes1,classesIds);
-            classSchema.find({$query:{left:{$lt:thisLeftNew,$gte:thisLeft},classId:{$ne:202}},$orderBy:{classId:-1}},fields,function(err2,classes2) {
+            classSchema.find({$query:{left:{$lt:thisLeftNew,$gte:thisLeft},classId:{$ne:202}},$orderBy:{classId:-1}},{day:1,leftDate:1,rightDate:1,accessProject:1,left:1,right:1,id:1,classId:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1},function(err2,classes2) {
                 if (err2)
                     res.send({result: false, message: "Oops Something went wrong - please try again2"});
                 classesList.push(classes2);
