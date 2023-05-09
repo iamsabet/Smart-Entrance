@@ -460,7 +460,8 @@ var clas = {
                                     for (cls in classes6){
                                         clsx = classes6[cls];
                                         if(lstx.indexOf(clsx.classId) === -1){
-                                            cls6.push(clsx)
+                                            lstx.push(clsx.classId);
+                                            cls6.push(clsx);
                                         }
                                     }
                                     classesList.push(cls6);
