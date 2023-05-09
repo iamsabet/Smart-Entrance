@@ -456,7 +456,7 @@ var user = {
                 if (req.body.rfId) {
                     let rfId = req.body.rfId;
                     let sendResponse = true;
-                    if(userx.rfId.length === 10){
+                    if(userx.rfId.length === 5){
                         userSchema.update({username:userx.username},{
                             $pop:{rfId:-1}
                         },function(err,resultm){
