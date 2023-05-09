@@ -591,6 +591,15 @@
             }
         });
     });
+    function sort_by_key(array, key){
+        return array.sort(function(a, b)
+        {
+        var x = a[key]; var y = b[key];
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+        });
+    }
+
+    
     function getNumberClasses(){
 
         $.ajax({
@@ -600,6 +609,7 @@
 
             },
             success:function(res){
+                res = sort_by_key(res, 'classId');
                 let numbers = [];
                 $("#monitor .classList").html("");
                 if (res.length > 0) {
