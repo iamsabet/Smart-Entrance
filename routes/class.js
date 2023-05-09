@@ -474,7 +474,7 @@ var clas = {
                             classesIds = clas.addClassesIds(classes5,classesIds);
 
                             // classes open by superstudent users : + 
-                            classSchema.find({$query:{situation:"open",classId:{$nin:classesIds}}},fields,function(err,classes6){
+                            classSchema.find({situation:"open",classId:{$nin:classesIds}},fields,function(err,classes6){
                                 if(err)
                                     res.send({result: false, message: "Oops Something went wrong - please try again5"});
                                 else{
