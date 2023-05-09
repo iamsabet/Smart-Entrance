@@ -432,7 +432,7 @@ var clas = {
                 ]},
             {classId:{$ne:202}}]},fields,function(err1,classes1) {
             if (err1){
-                throw err1
+                throw err1;
                 res.send({result: false, message: "Oops Something went wrong - please try again1"});
             }
             classesList.push(classes1);
