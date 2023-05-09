@@ -599,7 +599,7 @@
         });
     }
 
-    
+    final_res = []
     function getNumberClasses(){
 
         $.ajax({
@@ -610,6 +610,7 @@
             },
             success:function(res){
                 res = sort_by_key(res, 'classId');
+                final_res = res;
                 let numbers = [];
                 $("#monitor .classList").html("");
                 if (res.length > 0) {
