@@ -430,9 +430,11 @@ var clas = {
                     {left:{$lt:thisLeft}},
                     {right:{$gt:thisLeft}}
                 ]},
-            {classId:{$ne:202}},{day:1,leftDate:1,rightDate:1,left:1,right:1,id:1,classId:1,accessProject:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1},function(err1,classes1) {
-            if (err1)
+            {classId:{$ne:202}},fields,function(err1,classes1) {
+            if (err1){
+                throw err1
                 res.send({result: false, message: "Oops Something went wrong - please try again1"});
+            }
             classesList.push(classes1);
             classesIds = clas.addClassesIds(classes1,classesIds);
             classSchema.find({$and:[
