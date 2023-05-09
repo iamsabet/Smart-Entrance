@@ -63,6 +63,14 @@
     var timer;
     var thisDay ;
     var classesList = [];
+    function sort_by_key(array, key){
+        return array.sort(function(a, b){
+        var x = a[key]; var y = b[key];
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+        });
+    }
+
+    let final_res = []
     $(document).ready(function(){
         initPage();
         getNowClasses();
@@ -770,14 +778,7 @@
         }
     });
 
-    function sort_by_key(array, key){
-        return array.sort(function(a, b){
-        var x = a[key]; var y = b[key];
-            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-        });
-    }
-
-    let final_res = []
+   
     function getNumberClasses(){
 
         $("#admin .clsList").html("");
