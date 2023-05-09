@@ -424,7 +424,13 @@ var clas = {
         let fields = {day:1,leftDate:1,rightDate:1,left:1,accessProject:1,right:1,id:1,classId:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1};
 
 
-        classSchema.find({$query:{left:{$lt:thisLeft},right:{$gt:thisLeft},classId:{$ne:202}},$orderBy:{classId:-1}},{day:1,leftDate:1,rightDate:1,left:1,right:1,id:1,classId:1,accessProject:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1},function(err1,classes1) {
+        classSchema.find(
+            {   
+                $and:[
+                    {left:{$lt:thisLeft}},
+                    {right:{$gt:thisLeft}}
+                ]},
+            {classId:{$ne:202}},{day:1,leftDate:1,rightDate:1,left:1,right:1,id:1,classId:1,accessProject:1,name:1,situation:1,ostadUsername:1,isPublic:1,studentsList:1},function(err1,classes1) {
             if (err1)
                 res.send({result: false, message: "Oops Something went wrong - please try again1"});
             classesList.push(classes1);
@@ -488,7 +494,7 @@ var clas = {
                     }).sort({classId:-1});
                 }).sort({classId:-1});
             }).sort({classId:-1});
-        });
+        }).sort({classId:-1});
     },
     getInfo: function(req, res,id) {
         classSchema.findOne({id:id},{classId:1,id:1,name:1,day:1,ostadUsername:1,situation:1,rightDate:1,leftDate:1,accessProject:1,left:1,right:1,isPublic:1,studentsList:1},function(err,clas) {
