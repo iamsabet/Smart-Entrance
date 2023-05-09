@@ -482,9 +482,9 @@ var clas = {
                                     classesList.push(classes6);
                                     res.send(classesList);
                                 }
-                            });
+                            }).sort({classId:-1});
                             
-                        });
+                        }).sort({classId:-1});
                     }).sort({classId:-1});
                 }).sort({classId:-1});
             }).sort({classId:-1});
